@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScanOne — Brutalist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: #FFFFFF;
+      font-family: 'Space Grotesk', sans-serif;
+      color: #111111;
+      min-height: 100vh;
+    }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 3px solid #111111;
+      background: #FFFFFF;
+    }
+
+    .nav-brand {
+      padding: 14px 24px;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-right: 3px solid #111111;
+      background: #DC1F26;
+      color: #FFFFFF;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      flex: 1;
+    }
+
+    .nav-links li {
+      border-right: 3px solid #111111;
+    }
+
+    .nav-links li a {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #111111;
+      text-decoration: none;
+      transition: background 0.1s;
+    }
+
+    .nav-links li a:hover,
+    .nav-links li a.active {
+      background: #DC1F26;
+      color: #FFFFFF;
+    }
+
+    .nav-sp {
+      margin-left: auto;
+      padding: 14px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #111111;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-left: 3px solid #111111;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ─── LAYOUT ─── */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    /* ─── JACOB ─── */
+    .jacob-box {
+      border: 3px solid #111111;
+      margin-bottom: 36px;
+      overflow: hidden;
+    }
+
+    .jacob-box-header {
+      background: #DC1F26;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .jacob-box-header-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #FFFFFF;
+    }
+
+    .j-avatar-brut {
+      width: 32px;
+      height: 32px;
+      border: 2px solid #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    .jacob-box-body {
+      padding: 20px 20px;
+      background: #FFFFFF;
+    }
+
+    .jacob-greeting-brut {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111111;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+
+    .jacob-sub-brut {
+      font-size: 13px;
+      color: #555555;
+    }
+
+    /* ─── STATS ROW ─── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 3px solid #111111;
+      margin-bottom: 36px;
+    }
+
+    .stat-block {
+      padding: 24px 20px;
+      border-right: 3px solid #111111;
+    }
+
+    .stat-block:last-child { border-right: none; }
+
+    .stat-num-brut {
+      font-size: 52px;
+      font-weight: 700;
+      color: #DC1F26;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label-brut {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #111111;
+    }
+
+    /* ─── NEW ASSESSMENT ─── */
+    .btn-new-brut {
+      display: block;
+      width: 100%;
+      padding: 18px 24px;
+      background: #DC1F26;
+      color: #111111;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border: 3px solid #111111;
+      cursor: pointer;
+      text-align: center;
+      margin-bottom: 36px;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .btn-new-brut:hover {
+      background: #111111;
+      color: #FFFFFF;
+    }
+
+    /* ─── SECTION TITLE ─── */
+    .brut-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #111111;
+      margin-bottom: 0;
+      padding: 10px 16px;
+      background: #111111;
+      color: #FFFFFF;
+      display: inline-block;
+      margin-bottom: -3px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── TABLE ─── */
+    .scan-table-wrap {
+      border: 3px solid #111111;
+    }
+
+    .scan-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .scan-table thead {
+      background: #F0F0F0;
+    }
+
+    .scan-table thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 12px 18px;
+      border-bottom: 3px solid #111111;
+      border-right: 2px solid #E5E5E5;
+      color: #111111;
+    }
+
+    .scan-table thead th:last-child { border-right: none; }
+
+    .scan-table tbody tr {
+      border-bottom: 2px solid #E5E5E5;
+      transition: background 0.1s;
+    }
+
+    .scan-table tbody tr:last-child { border-bottom: none; }
+
+    .scan-table tbody tr:hover { background: #FFF0F0; }
+
+    .scan-table tbody td {
+      padding: 16px 18px;
+      font-size: 14px;
+      border-right: 2px solid #E5E5E5;
+    }
+
+    .scan-table tbody td:last-child { border-right: none; }
+
+    /* Status column — red left block */
+    .status-col {
+      background: #DC1F26;
+      width: 6px;
+      padding: 0 !important;
+    }
+
+    .status-col.review-col { background: #E5E5E5; }
+
+    .status-col.scanning-col {
+      background: #DC1F26;
+      animation: col-pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes col-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .domain-brut {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .status-text-brut {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .status-text-brut.ready   { color: #DC1F26; }
+    .status-text-brut.review  { color: #888888; }
+    .status-text-brut.scan    { color: #DC1F26; }
+
+    .action-brut {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111111;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 5px 12px;
+      border: 2px solid #111111;
+      display: inline-block;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .action-brut:hover {
+      background: #DC1F26;
+      color: #FFFFFF;
+      border-color: #DC1F26;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-brand">ScanOne</div>
+    <ul class="nav-links">
+      <li><a href="#" class="active">Dashboard</a></li>
+      <li><a href="#">History</a></li>
+      <li><a href="#">Vulns</a></li>
+      <li><a href="#">Account</a></li>
+    </ul>
+    <div class="nav-sp">120 SP</div>
+  </nav>
+
+  <div class="container">
+
+    <!-- JACOB -->
+    <div class="jacob-box">
+      <div class="jacob-box-header">
+        <div class="j-avatar-brut">J</div>
+        <span class="jacob-box-header-title">Jacob — AI V-CISO // Active</span>
+      </div>
+      <div class="jacob-box-body">
+        <div class="jacob-greeting-brut">Good evening, Agent.</div>
+        <div class="jacob-sub-brut">Threat intel standing by. 3 assessments active. Platform is live.</div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-block">
+        <div class="stat-num-brut">7</div>
+        <div class="stat-label-brut">Total Scans</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num-brut">4</div>
+        <div class="stat-label-brut">Reports Ready</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num-brut">3</div>
+        <div class="stat-label-brut">Under Review</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num-brut">120</div>
+        <div class="stat-label-brut">SP Balance</div>
+      </div>
+    </div>
+
+    <!-- NEW ASSESSMENT -->
+    <button class="btn-new-brut">+ New Assessment</button>
+
+    <!-- SCANS TABLE -->
+    <div class="brut-section-title">Recent Assessments</div>
+    <div class="scan-table-wrap">
+      <table class="scan-table">
+        <thead>
+          <tr>
+            <th style="width:6px;padding:0;"></th>
+            <th>Domain</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="status-col"></td>
+            <td class="domain-brut">gtbank.com</td>
+            <td style="color:#888;font-size:13px;font-weight:600;">20 MAR 2026</td>
+            <td><span class="status-text-brut ready">Report Ready</span></td>
+            <td><a href="#" class="action-brut">View</a></td>
+          </tr>
+          <tr>
+            <td class="status-col review-col"></td>
+            <td class="domain-brut">firstbanknigeria.com</td>
+            <td style="color:#888;font-size:13px;font-weight:600;">18 MAR 2026</td>
+            <td><span class="status-text-brut review">Under Review</span></td>
+            <td><a href="#" class="action-brut">View</a></td>
+          </tr>
+          <tr>
+            <td class="status-col scanning-col"></td>
+            <td class="domain-brut">zenithbank.com</td>
+            <td style="color:#888;font-size:13px;font-weight:600;">21 MAR 2026</td>
+            <td><span class="status-text-brut scan">Scanning...</span></td>
+            <td><a href="#" class="action-brut" style="border-color:#E5E5E5;color:#AAAAAA;pointer-events:none;">Live</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</body>
+</html>

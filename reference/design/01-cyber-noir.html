@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanOne — Cyber Noir Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #020617;
+  --surface: rgba(15,23,42,0.7);
+  --surface-hover: rgba(15,23,42,0.9);
+  --border: rgba(99,102,241,0.15);
+  --border-red: rgba(220,31,38,0.3);
+  --red: #DC1F26;
+  --red-dim: rgba(220,31,38,0.12);
+  --indigo: #6366F1;
+  --indigo-dim: rgba(99,102,241,0.12);
+  --green: #10B981;
+  --green-dim: rgba(16,185,129,0.12);
+  --amber: #F59E0B;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #475569;
+  --sidebar-w: 240px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Background grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ambient glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(220,31,38,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: rgba(2,6,23,0.95);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  backdrop-filter: blur(20px);
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, var(--red), #FF4757);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(220,31,38,0.4);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.logo-sub {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--red);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  padding: 16px 12px;
+  flex: 1;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin: 16px 0 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: var(--indigo-dim);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid var(--border-red);
+}
+
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.nav-item.active .nav-icon { opacity: 1; }
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.sp-badge {
+  background: rgba(240,196,64,0.08);
+  border: 1px solid rgba(240,196,64,0.2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sp-label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.sp-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #F0C040;
+}
+
+.sp-unit {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  display: block;
+  text-align: right;
+}
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 32px 36px;
+  max-width: calc(100vw - var(--sidebar-w));
+}
+
+/* ── HEADER ── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.page-title span {
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.btn-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(220,31,38,0.35), 0 4px 12px rgba(220,31,38,0.25);
+  transition: all 0.2s;
+  letter-spacing: 0.2px;
+}
+
+.btn-new:hover {
+  background: #FF2D35;
+  box-shadow: 0 0 28px rgba(220,31,38,0.5), 0 6px 16px rgba(220,31,38,0.35);
+  transform: translateY(-1px);
+}
+
+/* ── JACOB SECTION ── */
+.jacob-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.jacob-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 200px; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(220,31,38,0.03));
+  pointer-events: none;
+}
+
+.jacob-avatar {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1E1B4B, #312E81);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  position: relative;
+  animation: jacob-pulse 3s ease-in-out infinite;
+}
+
+@keyframes jacob-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220,31,38,0.4), 0 0 0 4px rgba(220,31,38,0.1); }
+  50% { box-shadow: 0 0 0 8px rgba(220,31,38,0.0), 0 0 16px rgba(220,31,38,0.4); }
+}
+
+.jacob-status {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--green);
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  animation: status-blink 2s ease-in-out infinite;
+}
+
+@keyframes status-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.jacob-info { flex: 1; }
+
+.jacob-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.jacob-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.jacob-badge {
+  font-size: 9px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--red);
+  background: var(--red-dim);
+  border: 1px solid var(--border-red);
+  border-radius: 4px;
+  padding: 2px 6px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.jacob-message {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.jacob-message strong { color: var(--text-primary); }
+
+.jacob-meta {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+  cursor: default;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 12px 12px 0 0;
+}
+
+.stat-card.red::before { background: linear-gradient(90deg, var(--red), #FF6B35); }
+.stat-card.indigo::before { background: linear-gradient(90deg, var(--indigo), #8B5CF6); }
+.stat-card.green::before { background: linear-gradient(90deg, var(--green), #34D399); }
+
+.stat-card:hover { border-color: var(--border-red); }
+
+.stat-label {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 38px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.stat-card.red .stat-value { color: var(--red); }
+.stat-card.indigo .stat-value { color: var(--indigo); }
+.stat-card.green .stat-value { color: var(--green); }
+
+.stat-delta {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-delta.up { color: var(--green); }
+
+.stat-icon {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.stat-card.red .stat-icon { background: var(--red-dim); }
+.stat-card.indigo .stat-icon { background: var(--indigo-dim); }
+.stat-card.green .stat-icon { background: var(--green-dim); }
+
+/* ── RECENT ASSESSMENTS ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 14px;
+  background: var(--red);
+  border-radius: 2px;
+}
+
+.section-link {
+  font-size: 12px;
+  color: var(--indigo);
+  cursor: pointer;
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+}
+
+.section-link:hover { color: #818CF8; }
+
+.assessments-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+}
+
+.table-head {
+  display: grid;
+  grid-template-columns: 1fr 140px 110px 90px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(2,6,23,0.5);
+}
+
+.th {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.scan-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 110px 90px;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(99,102,241,0.07);
+  align-items: center;
+  transition: background 0.15s;
+  position: relative;
+}
+
+.scan-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 0;
+}
+
+.scan-row.ready::before { background: var(--green); }
+.scan-row.review::before { background: var(--amber); }
+.scan-row.scanning::before { background: var(--indigo); }
+
+.scan-row:last-child { border-bottom: none; }
+.scan-row:hover { background: rgba(99,102,241,0.04); }
+
+.scan-domain {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scan-domain-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(99,102,241,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.scan-date {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.scan-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.scan-status.ready {
+  background: rgba(16,185,129,0.1);
+  color: var(--green);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+
+.scan-status.review {
+  background: rgba(245,158,11,0.1);
+  color: var(--amber);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+.scan-status.scanning {
+  background: rgba(99,102,241,0.1);
+  color: var(--indigo);
+  border: 1px solid rgba(99,102,241,0.2);
+}
+
+.scan-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.scan-status.scanning::before {
+  animation: blink-dot 1s ease-in-out infinite;
+}
+
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.scan-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-view {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.5px;
+}
+
+.btn-view:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* ── BOTTOM GRID ── */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  backdrop-filter: blur(20px);
+}
+
+.card-title {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.risk-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.risk-bar-label {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.risk-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.risk-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+.risk-bar-fill.critical { background: var(--red); }
+.risk-bar-fill.high { background: var(--amber); }
+.risk-bar-fill.medium { background: var(--indigo); }
+.risk-bar-fill.low { background: var(--green); }
+
+.risk-bar-count {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  width: 24px;
+  text-align: right;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.activity-text {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.activity-time {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">S1</div>
+        <div class="logo-text">
+          <span class="logo-name">ScanOne</span>
+          <span class="logo-sub">by Ethnos Cyber</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+
+      <a href="#" class="nav-item active">
+        <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Dashboard
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        History
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        Vulnerabilities
+      </a>
+
+      <div class="nav-section-label">Settings</div>
+
+      <a href="#" class="nav-item">
+        <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        Account
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sp-badge">
+        <div>
+          <div class="sp-label">SP Balance</div>
+          <div class="sp-value">120</div>
+        </div>
+        <div>
+          <span class="sp-unit">ScanPoints</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard <span>/ Overview</span></div>
+      </div>
+      <button class="btn-new">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 4v16m8-8H4"/>
+        </svg>
+        New Assessment
+      </button>
+    </div>
+
+    <!-- Jacob AI -->
+    <div class="jacob-card">
+      <div class="jacob-avatar">
+        J
+        <div class="jacob-status"></div>
+      </div>
+      <div class="jacob-info">
+        <div class="jacob-name-row">
+          <span class="jacob-name">Jacob</span>
+          <span class="jacob-badge">AI V-CISO</span>
+        </div>
+        <div class="jacob-message">
+          Good morning. Your portfolio is holding steady — <strong>4 reports are ready</strong> for review and <strong>3 assessments</strong> are currently under QA analysis. No critical escalations in the last 24 hours.
+        </div>
+        <div class="jacob-meta">Last active: 2 min ago · Monitoring 3 active scans</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card red">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Total Scans</div>
+        <div class="stat-value">07</div>
+        <div class="stat-delta up">↑ 2 this month</div>
+      </div>
+      <div class="stat-card indigo">
+        <div class="stat-icon">📋</div>
+        <div class="stat-label">Reports Ready</div>
+        <div class="stat-value">04</div>
+        <div class="stat-delta">Awaiting delivery</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">🔍</div>
+        <div class="stat-label">Under Review</div>
+        <div class="stat-value">03</div>
+        <div class="stat-delta up">QA in progress</div>
+      </div>
+    </div>
+
+    <!-- Recent Assessments -->
+    <div class="section-header">
+      <div class="section-title">Recent Assessments</div>
+      <a href="#" class="section-link">view all →</a>
+    </div>
+
+    <div class="assessments-table">
+      <div class="table-head">
+        <div class="th">Target</div>
+        <div class="th">Date</div>
+        <div class="th">Status</div>
+        <div class="th"></div>
+      </div>
+
+      <div class="scan-row ready">
+        <div class="scan-domain">
+          <div class="scan-domain-icon">🏦</div>
+          gtbank.com
+        </div>
+        <div class="scan-date">21 Mar 2026</div>
+        <div><span class="scan-status ready">Report Ready</span></div>
+        <div class="scan-action"><button class="btn-view">VIEW →</button></div>
+      </div>
+
+      <div class="scan-row review">
+        <div class="scan-domain">
+          <div class="scan-domain-icon">🏛</div>
+          firstbanknigeria.com
+        </div>
+        <div class="scan-date">20 Mar 2026</div>
+        <div><span class="scan-status review">Under Review</span></div>
+        <div class="scan-action"><button class="btn-view">VIEW →</button></div>
+      </div>
+
+      <div class="scan-row scanning">
+        <div class="scan-domain">
+          <div class="scan-domain-icon">🔵</div>
+          zenithbank.com
+        </div>
+        <div class="scan-date">21 Mar 2026</div>
+        <div><span class="scan-status scanning">Scanning</span></div>
+        <div class="scan-action"><button class="btn-view">VIEW →</button></div>
+      </div>
+    </div>
+
+    <!-- Bottom Grid -->
+    <div class="bottom-grid">
+      <div class="card">
+        <div class="card-title">Risk Distribution</div>
+        <div class="risk-bar-row">
+          <span class="risk-bar-label">Critical</span>
+          <div class="risk-bar-track">
+            <div class="risk-bar-fill critical" style="width: 55%"></div>
+          </div>
+          <span class="risk-bar-count">12</span>
+        </div>
+        <div class="risk-bar-row">
+          <span class="risk-bar-label">High</span>
+          <div class="risk-bar-track">
+            <div class="risk-bar-fill high" style="width: 70%"></div>
+          </div>
+          <span class="risk-bar-count">18</span>
+        </div>
+        <div class="risk-bar-row">
+          <span class="risk-bar-label">Medium</span>
+          <div class="risk-bar-track">
+            <div class="risk-bar-fill medium" style="width: 85%"></div>
+          </div>
+          <span class="risk-bar-count">24</span>
+        </div>
+        <div class="risk-bar-row">
+          <span class="risk-bar-label">Low</span>
+          <div class="risk-bar-track">
+            <div class="risk-bar-fill low" style="width: 40%"></div>
+          </div>
+          <span class="risk-bar-count">9</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Recent Activity</div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background: var(--green)"></div>
+          <div class="activity-text">gtbank.com report stamped and ready for delivery</div>
+          <div class="activity-time">2h ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background: var(--amber)"></div>
+          <div class="activity-text">firstbanknigeria.com QA review started by admin</div>
+          <div class="activity-time">5h ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot" style="background: var(--indigo)"></div>
+          <div class="activity-text">zenithbank.com deep scan phase 8 — TLS analysis</div>
+          <div class="activity-time">Now</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

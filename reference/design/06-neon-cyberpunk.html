@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanOne — Neon Cyberpunk</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cyan: #00F5FF;
+  --pink: #FF006E;
+  --red: #DC1F26;
+  --bg: #050510;
+  --bg2: #080820;
+  --bg3: #0C0C2A;
+  --text: #E0E8FF;
+  --dim: #6070A0;
+}
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 245, 255, 0.015) 2px,
+    rgba(0, 245, 255, 0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  animation: scanlines 8s linear infinite;
+}
+
+/* Grid overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes scanlines {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+@keyframes flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.85; }
+  97% { opacity: 1; }
+  98% { opacity: 0.9; }
+}
+
+@keyframes pulse-cyan {
+  0%, 100% { box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan), 0 0 40px var(--cyan); }
+  50% { box-shadow: 0 0 5px var(--cyan), 0 0 10px var(--cyan), 0 0 20px var(--cyan); }
+}
+
+@keyframes pulse-pink {
+  0%, 100% { box-shadow: 0 0 10px var(--pink), 0 0 20px var(--pink), 0 0 40px var(--pink); }
+  50% { box-shadow: 0 0 5px var(--pink), 0 0 10px var(--pink), 0 0 20px var(--pink); }
+}
+
+@keyframes neon-text-cyan {
+  0%, 100% { text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan), 0 0 40px var(--cyan), 0 0 80px var(--cyan); }
+  50% { text-shadow: 0 0 5px var(--cyan), 0 0 10px var(--cyan), 0 0 20px var(--cyan); }
+}
+
+@keyframes spin-hex {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes data-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; } 50% { opacity: 0; }
+}
+
+@keyframes slide-in {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* Left nav */
+.nav {
+  width: 72px;
+  background: rgba(8,8,32,0.9);
+  border-right: 1px solid rgba(0,245,255,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  flex-shrink: 0;
+}
+
+.nav-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
+  letter-spacing: 2px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  margin-bottom: 20px;
+  animation: flicker 6s infinite;
+}
+
+.nav-item {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  transition: height 0.2s;
+}
+
+.nav-item.active {
+  color: var(--cyan);
+}
+
+.nav-item.active::before {
+  height: 70%;
+}
+
+.nav-item svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.nav-item.active svg {
+  filter: drop-shadow(0 0 4px var(--cyan));
+}
+
+.nav-item:hover {
+  color: var(--cyan);
+  background: rgba(0,245,255,0.05);
+}
+
+.nav-spacer { flex: 1; }
+
+/* Main content */
+.main {
+  flex: 1;
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  animation: slide-in 0.5s ease;
+}
+
+.header-left {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.header-left span {
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sp-chip {
+  background: rgba(0,245,255,0.05);
+  border: 1px solid rgba(0,245,255,0.3);
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sp-chip::before {
+  content: '◈';
+  font-size: 14px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00FF88;
+  box-shadow: 0 0 8px #00FF88;
+  animation: pulse-cyan 2s infinite;
+}
+
+/* Jacob section */
+.jacob-section {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: center;
+  background: rgba(8,8,32,0.8);
+  border: 1px solid rgba(0,245,255,0.15);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  animation: slide-in 0.6s ease;
+}
+
+.jacob-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--pink), transparent);
+  animation: neon-text-cyan 3s infinite;
+}
+
+/* Hexagon avatar */
+.jacob-hex-wrapper {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jacob-hex-ring {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(135deg, var(--cyan), var(--pink));
+  animation: spin-hex 8s linear infinite;
+}
+
+.jacob-hex {
+  position: relative;
+  width: 66px;
+  height: 66px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(135deg, rgba(0,245,255,0.15), rgba(255,0,110,0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--cyan);
+  text-shadow: 0 0 20px var(--cyan), 0 0 40px var(--cyan);
+  border: 1px solid rgba(0,245,255,0.3);
+  z-index: 1;
+}
+
+.jacob-text {}
+
+.jacob-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--pink);
+  text-shadow: 0 0 8px var(--pink);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.jacob-greeting {
+  font-family: 'Orbitron', monospace;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.jacob-greeting span {
+  color: var(--cyan);
+  text-shadow: 0 0 10px var(--cyan);
+}
+
+.jacob-msg {
+  font-size: 14px;
+  color: var(--dim);
+  line-height: 1.5;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.jacob-msg .cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--cyan);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: rgba(8,8,32,0.8);
+  border-radius: 6px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  animation: slide-in 0.7s ease;
+}
+
+.stat-card.cyan-card {
+  border: 1px solid rgba(0,245,255,0.35);
+  animation: pulse-cyan 3s infinite;
+}
+
+.stat-card.pink-card {
+  border: 1px solid rgba(255,0,110,0.35);
+  animation: pulse-pink 3s infinite;
+}
+
+.stat-card.red-card {
+  border: 1px solid rgba(220,31,38,0.45);
+  box-shadow: 0 0 15px rgba(220,31,38,0.1), inset 0 0 30px rgba(220,31,38,0.03);
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle, rgba(0,245,255,0.08), transparent 70%);
+}
+
+.stat-card.pink-card::after {
+  background: radial-gradient(circle, rgba(255,0,110,0.08), transparent 70%);
+}
+
+.stat-card.red-card::after {
+  background: radial-gradient(circle, rgba(220,31,38,0.08), transparent 70%);
+}
+
+.stat-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.stat-number {
+  font-family: 'Orbitron', monospace;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.cyan-card .stat-number {
+  color: var(--cyan);
+  text-shadow: 0 0 20px var(--cyan), 0 0 40px var(--cyan), 0 0 80px rgba(0,245,255,0.3);
+}
+
+.pink-card .stat-number {
+  color: var(--pink);
+  text-shadow: 0 0 20px var(--pink), 0 0 40px var(--pink), 0 0 80px rgba(255,0,110,0.3);
+}
+
+.red-card .stat-number {
+  color: var(--red);
+  text-shadow: 0 0 20px var(--red), 0 0 40px rgba(220,31,38,0.5);
+}
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--dim);
+  margin-top: 6px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* Bottom grid */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Assessments panel */
+.panel {
+  background: rgba(8,8,32,0.8);
+  border: 1px solid rgba(0,245,255,0.12);
+  border-radius: 8px;
+  padding: 20px;
+  animation: slide-in 0.8s ease;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0,245,255,0.1);
+}
+
+.panel-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.panel-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--dim);
+}
+
+.assessment-item {
+  padding: 12px 14px;
+  border: 1px solid rgba(0,245,255,0.06);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.assessment-item:hover {
+  border-color: rgba(0,245,255,0.3);
+  background: rgba(0,245,255,0.04);
+}
+
+.assessment-domain {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.assessment-time {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--dim);
+  margin-top: 3px;
+}
+
+.status-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.status-ready {
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.4);
+  color: #00FF88;
+  text-shadow: 0 0 6px #00FF88;
+}
+
+.status-review {
+  background: rgba(255,165,0,0.1);
+  border: 1px solid rgba(255,165,0,0.4);
+  color: #FFA500;
+  text-shadow: 0 0 6px #FFA500;
+}
+
+.status-scanning {
+  background: rgba(0,245,255,0.1);
+  border: 1px solid rgba(0,245,255,0.4);
+  color: var(--cyan);
+  text-shadow: 0 0 6px var(--cyan);
+  animation: flicker 2s infinite;
+}
+
+/* CTA Button */
+.new-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(90deg, rgba(0,245,255,0.15), rgba(255,0,110,0.15));
+  border: 1px solid rgba(0,245,255,0.5);
+  border-radius: 6px;
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
+  box-shadow: 0 0 20px rgba(0,245,255,0.2), 0 0 40px rgba(0,245,255,0.1), inset 0 0 20px rgba(0,245,255,0.05);
+  transition: all 0.3s;
+  margin-top: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.new-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(0,245,255,0.1) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.new-btn:hover::before {
+  transform: translateX(100%);
+}
+
+.new-btn:hover {
+  box-shadow: 0 0 30px rgba(0,245,255,0.4), 0 0 60px rgba(0,245,255,0.2), inset 0 0 30px rgba(0,245,255,0.1);
+  border-color: var(--cyan);
+}
+
+/* Live data feed panel */
+.data-panel {
+  background: rgba(8,8,32,0.8);
+  border: 1px solid rgba(255,0,110,0.2);
+  border-radius: 8px;
+  padding: 20px;
+  overflow: hidden;
+  animation: slide-in 0.9s ease;
+}
+
+.data-feed {
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.data-feed-inner {
+  animation: data-scroll 12s linear infinite;
+}
+
+.data-line {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  padding: 5px 0;
+  color: var(--dim);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  display: flex;
+  gap: 12px;
+}
+
+.data-line .ts { color: rgba(0,245,255,0.5); width: 80px; flex-shrink: 0; }
+.data-line .evt { flex: 1; }
+.data-line .ok { color: #00FF88; }
+.data-line .warn { color: #FFA500; }
+.data-line .crit { color: var(--pink); text-shadow: 0 0 4px var(--pink); }
+
+/* Corner decorations */
+.corner-tl, .corner-br {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--cyan);
+  border-style: solid;
+}
+.corner-tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+.corner-br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- Left Nav -->
+  <nav class="nav">
+    <div class="nav-logo">SCANONE</div>
+
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      DASH
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 12h3M18 12h3M12 3v3M12 18v3"/></svg>
+      HIST
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 2l9 7v6l-9 7-9-7V9z"/><path d="M12 8v4M12 16h.01"/></svg>
+      VULN
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      ACCT
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        ETHNOS CYBER // <span>VAPT PLATFORM v2.4</span> // THREAT MONITOR ACTIVE
+      </div>
+      <div class="header-right">
+        <div class="sp-chip">120 SP</div>
+        <div class="status-dot"></div>
+      </div>
+    </div>
+
+    <!-- Jacob -->
+    <div class="jacob-section">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+      <div class="jacob-hex-wrapper">
+        <div class="jacob-hex-ring"></div>
+        <div class="jacob-hex">J</div>
+      </div>
+      <div class="jacob-text">
+        <div class="jacob-badge">[ JACOB — AI V-CISO ONLINE ]</div>
+        <div class="jacob-greeting">Good morning, <span>Operator</span>. Systems nominal.</div>
+        <div class="jacob-msg">
+          Threat scan cycle complete. 4 reports flagged for review — 1 critical vector detected in fintech cluster. Recommend immediate remediation of GTBank TLS config.<span class="cursor"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card cyan-card">
+        <div class="stat-label">[ Total Scans ]</div>
+        <div class="stat-number">07</div>
+        <div class="stat-sub">▲ +2 THIS CYCLE</div>
+      </div>
+      <div class="stat-card pink-card">
+        <div class="stat-label">[ Reports Ready ]</div>
+        <div class="stat-number">04</div>
+        <div class="stat-sub">◈ AWAITING DELIVERY</div>
+      </div>
+      <div class="stat-card red-card">
+        <div class="stat-label">[ Under Review ]</div>
+        <div class="stat-number">03</div>
+        <div class="stat-sub">◉ QA IN PROGRESS</div>
+      </div>
+    </div>
+
+    <!-- Bottom grid -->
+    <div class="bottom-grid">
+
+      <!-- Assessments -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">// Recent Assessments</div>
+          <div class="panel-count">3 TARGETS</div>
+        </div>
+
+        <div class="assessment-item">
+          <div>
+            <div class="assessment-domain">gtbank.com</div>
+            <div class="assessment-time">2026-03-21 · 09:14 WAT</div>
+          </div>
+          <span class="status-badge status-ready">READY</span>
+        </div>
+
+        <div class="assessment-item">
+          <div>
+            <div class="assessment-domain">firstbanknigeria.com</div>
+            <div class="assessment-time">2026-03-20 · 16:42 WAT</div>
+          </div>
+          <span class="status-badge status-review">REVIEW</span>
+        </div>
+
+        <div class="assessment-item">
+          <div>
+            <div class="assessment-domain">zenithbank.com</div>
+            <div class="assessment-time">2026-03-21 · 11:03 WAT</div>
+          </div>
+          <span class="status-badge status-scanning">SCANNING</span>
+        </div>
+
+        <button class="new-btn">⬡ INITIATE NEW ASSESSMENT</button>
+      </div>
+
+      <!-- Live feed -->
+      <div class="data-panel">
+        <div class="panel-header">
+          <div class="panel-title">// Live Event Stream</div>
+          <div class="panel-count" style="color:var(--pink); text-shadow: 0 0 6px var(--pink);">● LIVE</div>
+        </div>
+        <div class="data-feed">
+          <div class="data-feed-inner">
+            <div class="data-line"><span class="ts">11:03:42</span><span class="evt">ZAP spider initialized → zenithbank.com</span><span class="ok">OK</span></div>
+            <div class="data-line"><span class="ts">11:03:44</span><span class="evt">Phase 1 RECON — crt.sh query</span><span class="ok">OK</span></div>
+            <div class="data-line"><span class="ts">11:03:51</span><span class="evt">12 subdomains discovered</span><span class="ok">+12</span></div>
+            <div class="data-line"><span class="ts">11:04:02</span><span class="evt">Phase 3 passive recon — HackerTarget</span><span class="ok">OK</span></div>
+            <div class="data-line"><span class="ts">11:04:18</span><span class="evt">SSL/TLS Phase 8 — testssl.sh</span><span class="warn">WARN</span></div>
+            <div class="data-line"><span class="ts">11:04:19</span><span class="evt">TLS 1.0 still enabled on port 443</span><span class="crit">CRIT</span></div>
+            <div class="data-line"><span class="ts">11:04:33</span><span class="evt">WAF detected: Imperva SecureSphere</span><span class="ok">OK</span></div>
+            <div class="data-line"><span class="ts">11:04:45</span><span class="evt">Shodan — 3 open ports found</span><span class="warn">WARN</span></div>
+            <div class="data-line"><span class="ts">11:05:01</span><span class="evt">Header analysis — missing HSTS</span><span class="warn">WARN</span></div>
+            <div class="data-line"><span class="ts">11:05:12</span><span class="evt">Phase 11 dirsearch initiated</span><span class="ok">OK</span></div>
+            <!-- duplicate for seamless loop -->
+            <div class="data-line"><span class="ts">11:03:42</span><span class="evt">ZAP spider initialized → zenithbank.com</span><span class="ok">OK</span></div>
+            <div class="data-line"><span class="ts">11:03:44</span><span class="evt">Phase 1 RECON — crt.sh query</span><span class="ok">OK</span></div>
+            <div class="data-line"><span class="ts">11:03:51</span><span class="evt">12 subdomains discovered</span><span class="ok">+12</span></div>
+            <div class="data-line"><span class="ts">11:04:02</span><span class="evt">Phase 3 passive recon — HackerTarget</span><span class="ok">OK</span></div>
+            <div class="data-line"><span class="ts">11:04:18</span><span class="evt">SSL/TLS Phase 8 — testssl.sh</span><span class="warn">WARN</span></div>
+            <div class="data-line"><span class="ts">11:04:19</span><span class="evt">TLS 1.0 still enabled on port 443</span><span class="crit">CRIT</span></div>
+            <div class="data-line"><span class="ts">11:04:33</span><span class="evt">WAF detected: Imperva SecureSphere</span><span class="ok">OK</span></div>
+            <div class="data-line"><span class="ts">11:04:45</span><span class="evt">Shodan — 3 open ports found</span><span class="warn">WARN</span></div>
+            <div class="data-line"><span class="ts">11:05:01</span><span class="evt">Header analysis — missing HSTS</span><span class="warn">WARN</span></div>
+            <div class="data-line"><span class="ts">11:05:12</span><span class="evt">Phase 11 dirsearch initiated</span><span class="ok">OK</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</body>
+</html>

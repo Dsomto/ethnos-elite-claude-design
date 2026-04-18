@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanOne — Aurora Glass</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal: #2DD4BF;
+  --lavender: #A78BFA;
+  --coral: #FB7185;
+  --indigo: #6366F1;
+  --bg: #0A0A1A;
+  --text: #F1F5F9;
+  --dim: #94A3B8;
+  --glass: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.1);
+  --glass-hover: rgba(255,255,255,0.08);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Aurora backgrounds */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.aurora-1 {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%);
+  top: -200px;
+  left: -100px;
+  animation: aurora-drift-1 12s ease-in-out infinite;
+}
+
+.aurora-2 {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,139,250,0.14) 0%, transparent 70%);
+  top: -100px;
+  right: -200px;
+  animation: aurora-drift-2 15s ease-in-out infinite;
+}
+
+.aurora-3 {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+  bottom: -100px;
+  left: 20%;
+  animation: aurora-drift-3 18s ease-in-out infinite;
+}
+
+.aurora-4 {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251,113,133,0.10) 0%, transparent 70%);
+  bottom: -50px;
+  right: 10%;
+  animation: aurora-drift-4 14s ease-in-out infinite;
+}
+
+@keyframes aurora-drift-1 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(60px,40px) scale(1.1); }
+  66% { transform: translate(-40px,60px) scale(0.95); }
+}
+
+@keyframes aurora-drift-2 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  40% { transform: translate(-80px,50px) scale(1.15); }
+  70% { transform: translate(40px,-30px) scale(0.9); }
+}
+
+@keyframes aurora-drift-3 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(60px,-60px) scale(1.2); }
+}
+
+@keyframes aurora-drift-4 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  45% { transform: translate(-50px,40px) scale(1.1); }
+}
+
+@keyframes float-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Glass mixin */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar nav */
+.nav {
+  width: 220px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(10,10,26,0.4);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  animation: float-in 0.5s ease;
+}
+
+.nav-brand {
+  padding: 8px 12px 24px;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 8px;
+}
+
+.nav-brand-name {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--teal), var(--lavender));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-brand-sub {
+  font-size: 11px;
+  color: var(--dim);
+  margin-top: 2px;
+}
+
+.nav-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--dim);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background: var(--glass-hover);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: rgba(45,212,191,0.1);
+  border: 1px solid rgba(45,212,191,0.2);
+  color: var(--teal);
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  flex-shrink: 0;
+}
+
+.nav-spacer { flex: 1; }
+
+.nav-sp {
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(45,212,191,0.06);
+  border: 1px solid rgba(45,212,191,0.15);
+}
+
+.nav-sp-label { font-size: 11px; color: var(--dim); margin-bottom: 4px; }
+
+.nav-sp-val {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--teal), var(--lavender));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-sp-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 28px 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Jacob card */
+.jacob-card {
+  border-radius: 20px;
+  padding: 24px 28px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  animation: float-in 0.6s ease;
+}
+
+.jacob-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(45,212,191,0.08), rgba(167,139,250,0.06), rgba(251,113,133,0.04));
+  pointer-events: none;
+}
+
+/* Jacob aurora avatar */
+.jacob-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.jacob-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px solid rgba(45,212,191,0.3);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+.jacob-ring-2 {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid rgba(167,139,250,0.2);
+  animation: pulse-ring 2s ease-out infinite 0.5s;
+}
+
+.jacob-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--teal), var(--lavender), var(--coral), var(--teal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  animation: spin-slow 8s linear infinite;
+}
+
+.jacob-avatar-inner {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(10,10,30,0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--teal);
+  position: absolute;
+}
+
+.jacob-content {}
+
+.jacob-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(45,212,191,0.1);
+  border: 1px solid rgba(45,212,191,0.2);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 11px;
+  color: var(--teal);
+  margin-bottom: 8px;
+}
+
+.jacob-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 6px var(--teal);
+}
+
+.jacob-greeting {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.jacob-greeting span {
+  background: linear-gradient(90deg, var(--teal), var(--lavender));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.jacob-msg {
+  font-size: 14px;
+  color: var(--dim);
+  line-height: 1.6;
+  max-width: 560px;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  animation: float-in 0.7s ease;
+}
+
+.stat-pill {
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.stat-pill:hover {
+  transform: translateY(-2px);
+  background: var(--glass-hover);
+}
+
+.stat-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-teal { background: rgba(45,212,191,0.15); }
+.icon-lav { background: rgba(167,139,250,0.15); }
+.icon-coral { background: rgba(251,113,133,0.15); }
+
+.stat-icon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
+  fill: none;
+  stroke: currentColor;
+}
+
+.stat-icon.teal { stroke: var(--teal); }
+.stat-icon.lav { stroke: var(--lavender); }
+.stat-icon.coral { stroke: var(--coral); }
+
+.stat-info {}
+.stat-num {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+.stat-num.teal { color: var(--teal); }
+.stat-num.lav { color: var(--lavender); }
+.stat-num.coral { color: var(--coral); }
+.stat-lbl { font-size: 13px; color: var(--dim); margin-top: 4px; }
+.stat-trend { font-size: 11px; margin-top: 2px; }
+.trend-up { color: var(--teal); }
+.trend-neutral { color: var(--dim); }
+
+/* Bottom grid */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  animation: float-in 0.8s ease;
+}
+
+/* Assessments card */
+.assessments-card {
+  border-radius: 20px;
+  padding: 22px 24px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: var(--dim);
+}
+
+.view-all {
+  font-size: 13px;
+  color: var(--teal);
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.view-all:hover { opacity: 1; }
+
+.assessment-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.assessment-item:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  transform: translateX(4px);
+}
+
+.assessment-item:last-child { margin-bottom: 0; }
+
+.domain-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.di-teal { background: rgba(45,212,191,0.15); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+.di-lav { background: rgba(167,139,250,0.15); color: var(--lavender); border: 1px solid rgba(167,139,250,0.2); }
+.di-coral { background: rgba(251,113,133,0.15); color: var(--coral); border: 1px solid rgba(251,113,133,0.2); }
+
+.domain-info { flex: 1; }
+.domain-name { font-size: 14px; font-weight: 500; }
+.domain-date { font-size: 12px; color: var(--dim); margin-top: 2px; }
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-ready {
+  background: rgba(45,212,191,0.12);
+  color: var(--teal);
+  border: 1px solid rgba(45,212,191,0.25);
+}
+
+.badge-review {
+  background: rgba(251,191,36,0.12);
+  color: #FBBF24;
+  border: 1px solid rgba(251,191,36,0.25);
+}
+
+.badge-scanning {
+  background: rgba(167,139,250,0.12);
+  color: var(--lavender);
+  border: 1px solid rgba(167,139,250,0.25);
+  animation: scanning-pulse 2s ease-in-out infinite;
+}
+
+@keyframes scanning-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+/* Right panel */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.new-btn-card {
+  border-radius: 20px;
+  padding: 22px;
+  background: linear-gradient(135deg, rgba(45,212,191,0.08), rgba(167,139,250,0.08));
+  border: 1px solid rgba(45,212,191,0.2);
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.new-btn-card:hover {
+  background: linear-gradient(135deg, rgba(45,212,191,0.14), rgba(167,139,250,0.14));
+  transform: translateY(-2px);
+  box-shadow: 0 20px 60px rgba(45,212,191,0.1);
+}
+
+.new-btn-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--teal), var(--lavender));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 24px;
+}
+
+.new-btn-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  background: linear-gradient(90deg, var(--teal), var(--lavender));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.new-btn-sub { font-size: 12px; color: var(--dim); }
+
+/* Threat summary card */
+.threat-card {
+  border-radius: 20px;
+  padding: 20px;
+  flex: 1;
+}
+
+.threat-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+
+.threat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.threat-row:last-child { margin-bottom: 0; }
+
+.threat-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.threat-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+.threat-label { font-size: 12px; color: var(--dim); width: 60px; }
+.threat-val { font-size: 12px; font-weight: 600; width: 24px; text-align: right; }
+
+.bar-coral { background: linear-gradient(90deg, var(--coral), rgba(251,113,133,0.6)); }
+.bar-lav { background: linear-gradient(90deg, #FB923C, rgba(251,146,60,0.6)); }
+.bar-yellow { background: linear-gradient(90deg, #FBBF24, rgba(251,191,36,0.6)); }
+.bar-teal { background: linear-gradient(90deg, var(--teal), rgba(45,212,191,0.6)); }
+
+.tc { color: var(--coral); }
+.lc { color: #FB923C; }
+.yc { color: #FBBF24; }
+.gc { color: var(--teal); }
+</style>
+</head>
+<body>
+
+<!-- Aurora background -->
+<div class="aurora-bg">
+  <div class="aurora-1"></div>
+  <div class="aurora-2"></div>
+  <div class="aurora-3"></div>
+  <div class="aurora-4"></div>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="nav glass">
+    <div class="nav-brand">
+      <div class="nav-brand-name">ScanOne</div>
+      <div class="nav-brand-sub">by Ethnos Cyber</div>
+    </div>
+
+    <div class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 8v4l3 3M3.05 11a9 9 0 1 0 .5-3"/><path d="M3 4v4h4"/></svg>
+      History
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2l9 7v6l-9 7-9-7V9z"/><path d="M12 8v4M12 16h.01"/></svg>
+      Vulnerabilities
+    </div>
+
+    <div class="nav-spacer"></div>
+
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Account
+    </div>
+
+    <div class="nav-sp">
+      <div class="nav-sp-label">SP Balance</div>
+      <div class="nav-sp-val">120</div>
+      <div class="nav-sp-sub">ScanPoints remaining</div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Jacob card -->
+    <div class="jacob-card glass">
+      <div class="jacob-avatar-wrapper">
+        <div class="jacob-ring"></div>
+        <div class="jacob-ring-2"></div>
+        <div class="jacob-avatar">
+          <div class="jacob-avatar-inner">J</div>
+        </div>
+      </div>
+      <div class="jacob-content">
+        <div class="jacob-badge">Jacob — AI V-CISO · Online</div>
+        <div class="jacob-greeting">Good morning, <span>Operator.</span></div>
+        <div class="jacob-msg">
+          Your threat landscape is active. 4 reports are ready for delivery — I've flagged a critical TLS misconfiguration on the GTBank assessment. FirstBank CORS policy requires your review. Zenithbank is currently scanning.
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-pill glass">
+        <div class="stat-icon-wrap icon-teal">
+          <svg class="stat-icon teal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-num teal">7</div>
+          <div class="stat-lbl">Total Scans</div>
+          <div class="stat-trend trend-up">↑ +2 this month</div>
+        </div>
+      </div>
+      <div class="stat-pill glass">
+        <div class="stat-icon-wrap icon-lav">
+          <svg class="stat-icon lav" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-num lav">4</div>
+          <div class="stat-lbl">Reports Ready</div>
+          <div class="stat-trend trend-up">↑ Ready for delivery</div>
+        </div>
+      </div>
+      <div class="stat-pill glass">
+        <div class="stat-icon-wrap icon-coral">
+          <svg class="stat-icon coral" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-num coral">3</div>
+          <div class="stat-lbl">Under Review</div>
+          <div class="stat-trend trend-neutral">QA in progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom grid -->
+    <div class="bottom-grid">
+
+      <!-- Assessments -->
+      <div class="assessments-card glass">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Recent Assessments</div>
+            <div class="card-subtitle">Your 3 latest security engagements</div>
+          </div>
+          <div class="view-all">View all →</div>
+        </div>
+
+        <div class="assessment-item">
+          <div class="domain-icon di-teal">GT</div>
+          <div class="domain-info">
+            <div class="domain-name">gtbank.com</div>
+            <div class="domain-date">Mar 21, 2026 · 09:14 WAT</div>
+          </div>
+          <span class="status-badge badge-ready">Report Ready</span>
+        </div>
+
+        <div class="assessment-item">
+          <div class="domain-icon di-lav">FB</div>
+          <div class="domain-info">
+            <div class="domain-name">firstbanknigeria.com</div>
+            <div class="domain-date">Mar 20, 2026 · 16:42 WAT</div>
+          </div>
+          <span class="status-badge badge-review">Under Review</span>
+        </div>
+
+        <div class="assessment-item">
+          <div class="domain-icon di-coral">ZB</div>
+          <div class="domain-info">
+            <div class="domain-name">zenithbank.com</div>
+            <div class="domain-date">Mar 21, 2026 · 11:03 WAT · ETA 4m</div>
+          </div>
+          <span class="status-badge badge-scanning">Scanning...</span>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="right-panel">
+
+        <!-- New Assessment CTA -->
+        <div class="new-btn-card">
+          <div class="new-btn-icon">+</div>
+          <div class="new-btn-title">New Assessment</div>
+          <div class="new-btn-sub">13-phase VAPT · AI-powered analysis</div>
+        </div>
+
+        <!-- Threat card -->
+        <div class="threat-card glass">
+          <div class="threat-title">Finding Severity Breakdown</div>
+
+          <div class="threat-row">
+            <span class="threat-label">Critical</span>
+            <div class="threat-bar-wrap"><div class="threat-bar-fill bar-coral" style="width:38%"></div></div>
+            <span class="threat-val tc">9</span>
+          </div>
+          <div class="threat-row">
+            <span class="threat-label">High</span>
+            <div class="threat-bar-wrap"><div class="threat-bar-fill bar-lav" style="width:74%"></div></div>
+            <span class="threat-val lc">18</span>
+          </div>
+          <div class="threat-row">
+            <span class="threat-label">Medium</span>
+            <div class="threat-bar-wrap"><div class="threat-bar-fill bar-yellow" style="width:88%"></div></div>
+            <span class="threat-val yc">21</span>
+          </div>
+          <div class="threat-row">
+            <span class="threat-label">Low</span>
+            <div class="threat-bar-wrap"><div class="threat-bar-fill bar-teal" style="width:59%"></div></div>
+            <span class="threat-val gc">14</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

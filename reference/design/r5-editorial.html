@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScanOne — Magazine Editorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #F8F5F0;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: #111111;
+      min-height: 100vh;
+    }
+
+    /* ─── MASTHEAD ─── */
+    header {
+      background: #F8F5F0;
+      border-bottom: 1px solid #D8D4CE;
+      padding: 0 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .masthead-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #111111;
+      letter-spacing: 0.02em;
+    }
+
+    .masthead-logo span {
+      color: #DC1F26;
+    }
+
+    .masthead-nav {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .masthead-nav a {
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666666;
+      transition: color 0.15s;
+      padding-bottom: 2px;
+      border-bottom: 1.5px solid transparent;
+    }
+
+    .masthead-nav a.active {
+      color: #DC1F26;
+      border-bottom-color: #DC1F26;
+    }
+
+    .masthead-nav a:hover { color: #111111; }
+
+    .masthead-sp {
+      font-size: 12px;
+      font-weight: 600;
+      color: #DC1F26;
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── MAIN ─── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 64px 40px 100px;
+    }
+
+    /* ─── JACOB BANNER ─── */
+    .jacob-editorial {
+      display: flex;
+      border: 1px solid #D8D4CE;
+      margin-bottom: 56px;
+      overflow: hidden;
+    }
+
+    .jacob-red-col {
+      width: 68px;
+      background: #DC1F26;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .jacob-red-col-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 900;
+      color: #FFFFFF;
+      transform: rotate(-90deg);
+      letter-spacing: 0.08em;
+    }
+
+    .jacob-right {
+      padding: 24px 28px;
+      flex: 1;
+      background: #FFFFFF;
+    }
+
+    .jacob-byline {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #DC1F26;
+      margin-bottom: 8px;
+    }
+
+    .jacob-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-style: italic;
+      color: #111111;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .jacob-caption {
+      font-size: 12px;
+      color: #888888;
+      line-height: 1.5;
+    }
+
+    /* ─── STATS STRIP ─── */
+    .stats-strip {
+      display: flex;
+      gap: 0;
+      border-top: 2px solid #111111;
+      border-bottom: 1px solid #D8D4CE;
+      margin-bottom: 52px;
+    }
+
+    .stat-strip-item {
+      flex: 1;
+      padding: 20px 0 16px;
+      border-right: 1px solid #D8D4CE;
+      text-align: center;
+    }
+
+    .stat-strip-item:last-child { border-right: none; }
+
+    .stat-strip-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 44px;
+      font-weight: 900;
+      color: #DC1F26;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-strip-label {
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #888888;
+    }
+
+    /* ─── NEW ASSESSMENT ─── */
+    .btn-assessment-wrap {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .btn-new-editorial {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #DC1F26;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 13px 32px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-new-editorial:hover { background: #B01218; }
+
+    /* ─── SECTION DIVIDER ─── */
+    .editorial-section {
+      margin-bottom: 48px;
+    }
+
+    .section-rule-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .section-rule-line {
+      flex: none;
+      height: 1.5px;
+      width: 32px;
+      background: #DC1F26;
+    }
+
+    .section-rule-text {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #DC1F26;
+    }
+
+    .section-rule-full {
+      flex: 1;
+      height: 1px;
+      background: #D8D4CE;
+    }
+
+    /* ─── SCAN LIST ─── */
+    .scan-article-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scan-article {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 18px 0;
+      border-bottom: 1px solid #E8E4DC;
+    }
+
+    .scan-article:last-child { border-bottom: none; }
+
+    .scan-article-left { flex: 1; }
+
+    .scan-article-domain {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #111111;
+      margin-bottom: 4px;
+    }
+
+    .scan-article-meta {
+      font-size: 12px;
+      color: #888888;
+      font-style: italic;
+    }
+
+    .scan-article-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .status-pill {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    .status-pill.ready {
+      background: #DC1F26;
+      color: #FFFFFF;
+    }
+
+    .status-pill.review {
+      background: #E8E4DC;
+      color: #666666;
+    }
+
+    .status-pill.scanning {
+      background: #FFE8E9;
+      color: #DC1F26;
+      border: 1px solid #DC1F26;
+    }
+
+    .scan-article-link {
+      font-size: 12px;
+      font-weight: 500;
+      color: #DC1F26;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+
+    .scan-article-link:hover { text-decoration: underline; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid #D8D4CE;
+      margin-top: 64px;
+      padding: 20px 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #F8F5F0;
+    }
+
+    .footer-text {
+      font-size: 11px;
+      color: #AAAAAA;
+      font-style: italic;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      color: #CCCCCC;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MASTHEAD -->
+  <header>
+    <div class="masthead-logo">Scan<span>One</span></div>
+    <ul class="masthead-nav">
+      <li><a href="#" class="active">Dashboard</a></li>
+      <li><a href="#">History</a></li>
+      <li><a href="#">Vulnerabilities</a></li>
+      <li><a href="#">Account</a></li>
+    </ul>
+    <div class="masthead-sp">120 SP</div>
+  </header>
+
+  <main>
+
+    <!-- JACOB EDITORIAL BANNER -->
+    <div class="jacob-editorial">
+      <div class="jacob-red-col">
+        <span class="jacob-red-col-letter">J</span>
+      </div>
+      <div class="jacob-right">
+        <div class="jacob-byline">Jacob — AI V-CISO &nbsp;·&nbsp; Ethnos Cyber</div>
+        <div class="jacob-quote">"Good evening, Agent. Threat intel standing by."</div>
+        <div class="jacob-caption">3 active assessments &nbsp;·&nbsp; Platform operational &nbsp;·&nbsp; Last update: moments ago</div>
+      </div>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+      <div class="stat-strip-item">
+        <div class="stat-strip-num">7</div>
+        <div class="stat-strip-label">Total Scans</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="stat-strip-num">4</div>
+        <div class="stat-strip-label">Reports Ready</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="stat-strip-num">3</div>
+        <div class="stat-strip-label">Under Review</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="stat-strip-num">120</div>
+        <div class="stat-strip-label">SP Balance</div>
+      </div>
+    </div>
+
+    <!-- NEW ASSESSMENT -->
+    <div class="btn-assessment-wrap">
+      <button class="btn-new-editorial">
+        New Assessment &nbsp;→
+      </button>
+    </div>
+
+    <!-- RECENT ASSESSMENTS -->
+    <div class="editorial-section">
+      <div class="section-rule-title">
+        <div class="section-rule-line"></div>
+        <span class="section-rule-text">Recent Assessments</span>
+        <div class="section-rule-full"></div>
+      </div>
+
+      <div class="scan-article-list">
+
+        <div class="scan-article">
+          <div class="scan-article-left">
+            <div class="scan-article-domain">gtbank.com</div>
+            <div class="scan-article-meta">Completed 20 March 2026 &nbsp;·&nbsp; Financial Services</div>
+          </div>
+          <div class="scan-article-right">
+            <span class="status-pill ready">Report Ready</span>
+            <a href="#" class="scan-article-link">View Report →</a>
+          </div>
+        </div>
+
+        <div class="scan-article">
+          <div class="scan-article-left">
+            <div class="scan-article-domain">firstbanknigeria.com</div>
+            <div class="scan-article-meta">Submitted 18 March 2026 &nbsp;·&nbsp; Financial Services</div>
+          </div>
+          <div class="scan-article-right">
+            <span class="status-pill review">Under Review</span>
+            <a href="#" class="scan-article-link" style="color:#AAAAAA;">Pending →</a>
+          </div>
+        </div>
+
+        <div class="scan-article">
+          <div class="scan-article-left">
+            <div class="scan-article-domain">zenithbank.com</div>
+            <div class="scan-article-meta"><em>In progress — 21 March 2026</em></div>
+          </div>
+          <div class="scan-article-right">
+            <span class="status-pill scanning">Scanning...</span>
+            <a href="#" class="scan-article-link">Live View →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <span class="footer-text">Ethnos Cyber — Confidential. For authorised personnel only.</span>
+    <span class="footer-logo">ScanOne</span>
+  </footer>
+
+</body>
+</html>

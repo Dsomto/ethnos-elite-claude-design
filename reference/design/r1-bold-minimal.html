@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScanOne — Bold Minimal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #FFFFFF;
+      color: #111111;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      height: 56px;
+      border-bottom: 1px solid #E5E5E5;
+    }
+
+    .nav-logo {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #111111;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #111111;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding-bottom: 2px;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    .nav-links a.active {
+      border-bottom: 2px solid #DC1F26;
+      color: #DC1F26;
+    }
+
+    .nav-links a:hover {
+      color: #DC1F26;
+    }
+
+    .nav-sp {
+      font-size: 13px;
+      font-weight: 600;
+      color: #DC1F26;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 64px 120px;
+    }
+
+    /* ── GREETING ── */
+    .greeting-block {
+      margin-bottom: 80px;
+    }
+
+    .jacob-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #DC1F26;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px 4px 4px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+
+    .jacob-pill-avatar {
+      width: 22px;
+      height: 22px;
+      background: #FFFFFF;
+      color: #DC1F26;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .greeting-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #111111;
+    }
+
+    .greeting-headline span {
+      color: #DC1F26;
+    }
+
+    .greeting-sub {
+      margin-top: 18px;
+      font-size: 15px;
+      color: #555555;
+      font-weight: 400;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex;
+      gap: 72px;
+      margin-bottom: 80px;
+      align-items: flex-end;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 64px;
+      font-weight: 900;
+      color: #111111;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #DC1F26;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .stats-divider {
+      width: 1px;
+      height: 60px;
+      background: #E5E5E5;
+      align-self: center;
+    }
+
+    /* ── NEW ASSESSMENT ── */
+    .new-assessment-btn {
+      display: block;
+      width: 100%;
+      padding: 20px;
+      background: #DC1F26;
+      color: #FFFFFF;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      text-transform: none;
+      margin-bottom: 72px;
+      transition: background 0.15s;
+    }
+
+    .new-assessment-btn:hover {
+      background: #B01218;
+    }
+
+    /* ── SCAN LIST ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #999999;
+      margin-bottom: 20px;
+    }
+
+    .scan-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .scan-table thead th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #999999;
+      padding: 0 0 14px;
+      border-bottom: 1px solid #E5E5E5;
+    }
+
+    .scan-table thead th:last-child { text-align: right; }
+
+    .scan-table tbody tr {
+      border-bottom: 1px solid #E5E5E5;
+      transition: background 0.1s;
+    }
+
+    .scan-table tbody tr:hover {
+      background: #F8F8F8;
+    }
+
+    .scan-table tbody td {
+      padding: 18px 0;
+      font-size: 14px;
+      color: #111111;
+    }
+
+    .scan-table tbody td:last-child { text-align: right; }
+
+    .domain {
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .status-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot.ready    { background: #DC1F26; }
+    .status-dot.review   { background: #FF3340; opacity: 0.5; }
+    .status-dot.scanning {
+      background: #DC1F26;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    .status-text {
+      font-size: 13px;
+      color: #555555;
+    }
+
+    .view-link {
+      font-size: 12px;
+      color: #DC1F26;
+      text-decoration: none;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .view-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">ScanOne</span>
+    <ul class="nav-links">
+      <li><a href="#" class="active">Dashboard</a></li>
+      <li><a href="#">History</a></li>
+      <li><a href="#">Vulnerabilities</a></li>
+      <li><a href="#">Account</a></li>
+    </ul>
+    <span class="nav-sp">120 SP</span>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- GREETING -->
+    <section class="greeting-block">
+      <div class="jacob-pill">
+        <div class="jacob-pill-avatar">J</div>
+        Jacob AI
+      </div>
+      <h1 class="greeting-headline">
+        Good evening,<br>
+        <span>Agent.</span>
+      </h1>
+      <p class="greeting-sub">Threat intel standing by. Your platform is live and monitoring active assessments.</p>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-number">7</span>
+        <span class="stat-label">Total Scans</span>
+      </div>
+      <div class="stats-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">4</span>
+        <span class="stat-label">Reports Ready</span>
+      </div>
+      <div class="stats-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">3</span>
+        <span class="stat-label">Under Review</span>
+      </div>
+      <div class="stats-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">120</span>
+        <span class="stat-label">SP Balance</span>
+      </div>
+    </div>
+
+    <!-- NEW ASSESSMENT -->
+    <button class="new-assessment-btn">+ New Assessment</button>
+
+    <!-- SCAN LIST -->
+    <div class="section-label">Recent Assessments</div>
+    <table class="scan-table">
+      <thead>
+        <tr>
+          <th>Domain</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="domain">gtbank.com</td>
+          <td style="color:#999;font-size:13px;">20 Mar 2026</td>
+          <td>
+            <div class="status-cell">
+              <div class="status-dot ready"></div>
+              <span class="status-text">Report Ready</span>
+            </div>
+          </td>
+          <td><a href="#" class="view-link">View →</a></td>
+        </tr>
+        <tr>
+          <td class="domain">firstbanknigeria.com</td>
+          <td style="color:#999;font-size:13px;">18 Mar 2026</td>
+          <td>
+            <div class="status-cell">
+              <div class="status-dot review"></div>
+              <span class="status-text">Under Review</span>
+            </div>
+          </td>
+          <td><a href="#" class="view-link">View →</a></td>
+        </tr>
+        <tr>
+          <td class="domain">zenithbank.com</td>
+          <td style="color:#999;font-size:13px;">21 Mar 2026</td>
+          <td>
+            <div class="status-cell">
+              <div class="status-dot scanning"></div>
+              <span class="status-text">Scanning...</span>
+            </div>
+          </td>
+          <td><a href="#" class="view-link" style="color:#999;pointer-events:none;">—</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </main>
+
+</body>
+</html>

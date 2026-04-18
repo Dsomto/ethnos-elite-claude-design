@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanOne — Gradient Royal Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-deep: #0D0221;
+  --bg-mid: #1A0533;
+  --surface: rgba(255,255,255,0.05);
+  --surface-hover: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.1);
+  --border-gold: rgba(240,192,64,0.3);
+  --gold: #F0C040;
+  --gold-dim: rgba(240,192,64,0.12);
+  --gold-bright: #FFD700;
+  --purple: #A78BFA;
+  --purple-dim: rgba(167,139,250,0.12);
+  --red: #DC1F26;
+  --green: #34D399;
+  --amber: #FBBF24;
+  --text-primary: #F8F4FF;
+  --text-secondary: #C4B5FD;
+  --text-muted: rgba(196,181,253,0.5);
+  --sidebar-w: 260px;
+}
+
+html, body {
+  height: 100%;
+  background: radial-gradient(ellipse at top left, #1A0533 0%, #0D0221 50%, #06011A 100%);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Star/particle background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 20%, rgba(255,255,255,0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 35%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 80%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 92% 55%, rgba(255,255,255,0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 65%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(2px 2px at 70% 10%, rgba(240,192,64,0.25) 0%, transparent 100%),
+    radial-gradient(2px 2px at 5% 50%, rgba(167,139,250,0.2) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 55% 90%, rgba(240,192,64,0.2) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ambient orb */
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -300px;
+  right: -200px;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: rgba(13,2,33,0.85);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  backdrop-filter: blur(24px);
+  z-index: 100;
+}
+
+.sidebar-top {
+  padding: 28px 22px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.logo-gem {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #F0C040, #FFD700, #E5A800);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--bg-deep);
+  box-shadow: 0 0 20px rgba(240,192,64,0.4), 0 4px 12px rgba(240,192,64,0.25);
+  flex-shrink: 0;
+}
+
+.logo-texts { }
+.logo-name { font-size: 17px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
+.logo-tagline { font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+
+.sidebar-nav { padding: 16px 14px; flex: 1; }
+
+.nav-group-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0 10px;
+  margin: 16px 0 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-bottom: 2px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--gold-dim), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 10px;
+}
+
+.nav-item:hover::before { opacity: 1; }
+.nav-item:hover { color: var(--gold); }
+
+.nav-item.active {
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid var(--border-gold);
+}
+
+.nav-item.active::before { display: none; }
+
+.nav-icon { font-size: 15px; flex-shrink: 0; }
+
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.sp-royal {
+  background: linear-gradient(135deg, rgba(240,192,64,0.1), rgba(240,192,64,0.05));
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.sp-royal-label {
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.sp-royal-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.sp-royal-unit { font-size: 11px; color: rgba(240,192,64,0.6); font-weight: 500; margin-top: 2px; }
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 36px 40px;
+}
+
+/* ── GREETING ── */
+.greeting-section {
+  margin-bottom: 36px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.greeting-left {}
+
+.greeting-eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.greeting-h1 {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -2px;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.greeting-h1 .highlight {
+  background: linear-gradient(135deg, var(--gold), #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.greeting-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-weight: 400;
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+.greeting-subtitle strong { color: var(--text-primary); font-weight: 600; }
+
+.greeting-right { flex-shrink: 0; }
+
+.btn-new-royal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--gold), #E5A800);
+  color: #1A0533;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 30px rgba(240,192,64,0.4), 0 8px 24px rgba(240,192,64,0.25);
+  transition: all 0.25s;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.btn-new-royal:hover {
+  box-shadow: 0 0 40px rgba(240,192,64,0.55), 0 12px 32px rgba(240,192,64,0.35);
+  transform: translateY(-2px);
+}
+
+/* ── JACOB ── */
+.jacob-royal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 26px;
+  margin-bottom: 28px;
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.jacob-royal::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 300px; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,0.04));
+}
+
+.jacob-avatar-royal {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #2D1B69, #4C1D95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--gold);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--border-gold), 0 0 20px rgba(240,192,64,0.2);
+  animation: royal-pulse 4s ease-in-out infinite;
+}
+
+@keyframes royal-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(240,192,64,0.3), 0 0 20px rgba(240,192,64,0.15); }
+  50% { box-shadow: 0 0 0 6px rgba(240,192,64,0.1), 0 0 30px rgba(240,192,64,0.3); }
+}
+
+.jacob-royal-info { flex: 1; }
+
+.jacob-royal-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.jacob-royal-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #1A0533;
+  background: linear-gradient(135deg, var(--gold), #E5A800);
+  border-radius: 20px;
+  padding: 3px 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.jacob-royal-msg {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.jacob-royal-msg strong { color: var(--text-primary); }
+
+.jacob-royal-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── STAT CARDS ── */
+.stats-royal {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-royal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  backdrop-filter: blur(16px);
+  transition: all 0.25s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-royal::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(240,192,64,0.05), transparent 70%);
+}
+
+.stat-royal:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-gold);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(240,192,64,0.1);
+}
+
+.stat-royal-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.stat-royal-value {
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -3px;
+  margin-bottom: 8px;
+}
+
+.stat-royal.s1 .stat-royal-value { color: var(--gold); }
+.stat-royal.s2 .stat-royal-value { color: var(--purple); }
+.stat-royal.s3 .stat-royal-value { color: var(--green); }
+
+.stat-royal-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ── ASSESSMENTS ── */
+.assessments-royal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.ar-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ar-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.ar-see-all {
+  font-size: 12px;
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.ar-see-all:hover { opacity: 1; }
+
+.ar-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 160px 110px;
+  padding: 16px 24px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.ar-row:last-child { border-bottom: none; }
+.ar-row:hover { background: rgba(255,255,255,0.03); }
+
+.ar-domain {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ar-domain-icon {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(167,139,250,0.08));
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--purple);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ar-domain-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.ar-date { font-size: 12.5px; color: var(--text-muted); }
+
+.ar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.ar-badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ar-badge.ready {
+  background: rgba(52,211,153,0.1);
+  color: #34D399;
+  border: 1px solid rgba(52,211,153,0.2);
+}
+
+.ar-badge.review {
+  background: rgba(251,191,36,0.1);
+  color: #FBBF24;
+  border: 1px solid rgba(251,191,36,0.2);
+}
+
+.ar-badge.scanning {
+  background: rgba(167,139,250,0.1);
+  color: var(--purple);
+  border: 1px solid rgba(167,139,250,0.2);
+}
+
+.ar-badge.scanning::before { animation: pulse-royal 1.2s ease-in-out infinite; }
+@keyframes pulse-royal { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.btn-royal-sm {
+  background: transparent;
+  border: 1px solid var(--border-gold);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+
+.btn-royal-sm:hover {
+  background: var(--gold-dim);
+  box-shadow: 0 0 12px rgba(240,192,64,0.2);
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo-row">
+        <div class="logo-gem">S1</div>
+        <div class="logo-texts">
+          <div class="logo-name">ScanOne</div>
+          <div class="logo-tagline">By Ethnos Cyber</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Navigation</div>
+
+      <a href="#" class="nav-item active">
+        <span class="nav-icon">⬡</span>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-icon">◈</span>
+        History
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-icon">⚠</span>
+        Vulnerabilities
+      </a>
+
+      <div class="nav-group-label">Settings</div>
+
+      <a href="#" class="nav-item">
+        <span class="nav-icon">◉</span>
+        Account
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sp-royal">
+        <div class="sp-royal-label">ScanPoints Balance</div>
+        <div class="sp-royal-value">120</div>
+        <div class="sp-royal-unit">Available Credits</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Greeting -->
+    <div class="greeting-section">
+      <div class="greeting-left">
+        <div class="greeting-eyebrow">Ethnos Security Operations</div>
+        <h1 class="greeting-h1">
+          Good<br><span class="highlight">Morning,</span><br>Analyst
+        </h1>
+        <p class="greeting-subtitle">
+          Your security portfolio is active. <strong>4 reports are ready</strong> for delivery and <strong>3 assessments</strong> are progressing through QA review.
+        </p>
+      </div>
+      <div class="greeting-right">
+        <button class="btn-new-royal">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 4v16m8-8H4"/>
+          </svg>
+          New Assessment
+        </button>
+      </div>
+    </div>
+
+    <!-- Jacob -->
+    <div class="jacob-royal">
+      <div class="jacob-avatar-royal">J</div>
+      <div class="jacob-royal-info">
+        <div class="jacob-royal-name">
+          Jacob
+          <span class="jacob-royal-badge">AI V-CISO</span>
+        </div>
+        <div class="jacob-royal-msg">
+          No critical escalations detected in the past 24 hours. <strong>firstbanknigeria.com</strong> is awaiting final QA sign-off — recommend prioritising review before client deadline.
+        </div>
+        <div class="jacob-royal-time">Last updated 2 minutes ago · Monitoring 3 active scans</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-royal">
+      <div class="stat-royal s1">
+        <div class="stat-royal-label">Total Assessments</div>
+        <div class="stat-royal-value">7</div>
+        <div class="stat-royal-sub">+2 this month · On track</div>
+      </div>
+      <div class="stat-royal s2">
+        <div class="stat-royal-label">Reports Ready</div>
+        <div class="stat-royal-value">4</div>
+        <div class="stat-royal-sub">Awaiting client delivery</div>
+      </div>
+      <div class="stat-royal s3">
+        <div class="stat-royal-label">Under Review</div>
+        <div class="stat-royal-value">3</div>
+        <div class="stat-royal-sub">QA processing in progress</div>
+      </div>
+    </div>
+
+    <!-- Assessments -->
+    <div class="assessments-royal">
+      <div class="ar-header">
+        <span class="ar-title">Recent Assessments</span>
+        <a href="#" class="ar-see-all">View All →</a>
+      </div>
+
+      <div class="ar-row">
+        <div class="ar-domain">
+          <div class="ar-domain-icon">G</div>
+          <div class="ar-domain-name">gtbank.com</div>
+        </div>
+        <div class="ar-date">21 Mar 2026</div>
+        <div><span class="ar-badge ready">Report Ready</span></div>
+        <div style="display:flex;justify-content:flex-end"><button class="btn-royal-sm">Open</button></div>
+      </div>
+
+      <div class="ar-row">
+        <div class="ar-domain">
+          <div class="ar-domain-icon">F</div>
+          <div class="ar-domain-name">firstbanknigeria.com</div>
+        </div>
+        <div class="ar-date">20 Mar 2026</div>
+        <div><span class="ar-badge review">Under Review</span></div>
+        <div style="display:flex;justify-content:flex-end"><button class="btn-royal-sm">Open</button></div>
+      </div>
+
+      <div class="ar-row">
+        <div class="ar-domain">
+          <div class="ar-domain-icon">Z</div>
+          <div class="ar-domain-name">zenithbank.com</div>
+        </div>
+        <div class="ar-date">21 Mar 2026</div>
+        <div><span class="ar-badge scanning">Scanning</span></div>
+        <div style="display:flex;justify-content:flex-end"><button class="btn-royal-sm">Open</button></div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

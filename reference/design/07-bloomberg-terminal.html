@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanOne — Bloomberg Terminal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #000000;
+  --bg2: #0A0A0A;
+  --bg3: #111111;
+  --orange: #FF8C00;
+  --orange-dim: #CC7000;
+  --teal: #00CED1;
+  --teal-dim: #009EA1;
+  --red: #DC1F26;
+  --green: #00CC44;
+  --yellow: #FFD700;
+  --text: #E0E0D0;
+  --dim: #707060;
+  --border: #222218;
+}
+
+body {
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 12px;
+  overflow-x: hidden;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes ticker-scroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-200%); }
+}
+@keyframes flash {
+  0% { background: rgba(255,140,0,0.3); }
+  100% { background: transparent; }
+}
+
+/* Top system bar */
+.sys-bar {
+  background: #1A0A00;
+  border-bottom: 2px solid var(--orange);
+  padding: 4px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.sys-bar-left {
+  color: var(--orange);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.sys-bar-right {
+  color: var(--dim);
+  display: flex;
+  gap: 20px;
+}
+
+.sys-bar-right span { color: var(--teal); }
+
+/* Ticker tape */
+.ticker {
+  background: #0A0500;
+  border-bottom: 1px solid #1A1000;
+  padding: 3px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticker-inner {
+  display: inline-block;
+  animation: ticker-scroll 30s linear infinite;
+  color: var(--dim);
+  font-size: 10px;
+}
+
+.ticker-inner .up { color: var(--green); }
+.ticker-inner .dn { color: var(--red); }
+.ticker-inner .ticker-item { margin: 0 24px; }
+
+/* Header row */
+.header-row {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.header-section {
+  padding: 0 16px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-section:last-child { border-right: none; margin-left: auto; }
+
+.header-logo {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--orange);
+  letter-spacing: 2px;
+}
+
+.header-label { color: var(--dim); font-size: 10px; }
+.header-value { color: var(--teal); font-size: 11px; font-weight: 600; }
+
+.stat-box {
+  text-align: center;
+  padding: 4px 16px;
+  border-right: 1px solid var(--border);
+}
+
+.stat-box-label { color: var(--dim); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+.stat-box-val { font-size: 16px; font-weight: 600; line-height: 1.2; }
+.stat-box-val.orange { color: var(--orange); }
+.stat-box-val.teal { color: var(--teal); }
+.stat-box-val.red { color: var(--red); }
+
+.stat-box-chg { font-size: 9px; }
+.chg-up { color: var(--green); }
+.chg-dn { color: var(--red); }
+
+/* Three column layout */
+.layout {
+  display: grid;
+  grid-template-columns: 160px 1fr 240px;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+}
+
+/* Left nav */
+.nav {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 0;
+}
+
+.nav-section-title {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--orange);
+  text-transform: uppercase;
+  padding: 8px 10px 4px;
+  border-bottom: 1px solid var(--border);
+  background: #0A0500;
+}
+
+.nav-item {
+  padding: 7px 10px;
+  border-bottom: 1px solid #0D0D0D;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.1s;
+  font-size: 11px;
+}
+
+.nav-item:hover { background: rgba(255,140,0,0.06); }
+
+.nav-item.active {
+  background: rgba(255,140,0,0.12);
+  border-left: 2px solid var(--orange);
+}
+
+.nav-item.active .nav-label { color: var(--orange); }
+
+.nav-label { color: var(--dim); }
+.nav-key { color: #333; font-size: 9px; }
+.nav-item.active .nav-key { color: #555; }
+
+.nav-sp {
+  padding: 10px;
+  background: #0A0500;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+.nav-sp-label { font-size: 9px; color: var(--dim); }
+.nav-sp-val { font-size: 18px; color: var(--orange); font-weight: 600; }
+.nav-sp-sub { font-size: 9px; color: var(--dim); }
+
+/* Center main */
+.main {
+  overflow-y: auto;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panel headers */
+.panel-hdr {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 5px 12px;
+  font-size: 10px;
+  color: var(--orange);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.panel-hdr .live {
+  color: var(--red);
+  animation: blink 1s step-end infinite;
+}
+
+/* Jacob analyst block */
+.jacob-block {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+  background: #060600;
+  flex-shrink: 0;
+}
+
+.jacob-hdr {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.jacob-avatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--orange), #FF4500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.jacob-meta {}
+.jacob-name { color: var(--orange); font-size: 11px; font-weight: 600; letter-spacing: 1px; }
+.jacob-title { color: var(--dim); font-size: 9px; letter-spacing: 1px; margin-top: 2px; }
+
+.analyst-rec {
+  background: #0A0800;
+  border: 1px solid #1A1400;
+  border-left: 3px solid var(--orange);
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.rec-tag {
+  display: inline-block;
+  background: var(--orange);
+  color: #000;
+  font-size: 9px;
+  padding: 1px 6px;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+/* Scan table */
+.scan-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.scan-table th {
+  background: var(--bg3);
+  color: var(--dim);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+
+.scan-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid #0A0A0A;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.scan-table tr:hover td { background: rgba(255,140,0,0.03); }
+.scan-table tr.flash-row td { animation: flash 0.5s ease; }
+
+.domain-cell { color: var(--teal); }
+.domain-cell span { color: var(--dim); font-size: 10px; }
+
+.indicator {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ind-ready { color: var(--green); }
+.ind-review { color: var(--yellow); }
+.ind-scan { color: var(--teal); }
+
+.severity-row { display: flex; gap: 4px; }
+.sev { font-size: 9px; padding: 1px 5px; font-weight: 600; }
+.sev-c { background: rgba(220,31,38,0.2); color: var(--red); }
+.sev-h { background: rgba(255,140,0,0.2); color: var(--orange); }
+.sev-m { background: rgba(255,215,0,0.2); color: var(--yellow); }
+.sev-l { background: rgba(0,204,68,0.2); color: var(--green); }
+
+.action-btn {
+  background: transparent;
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  padding: 2px 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+
+.action-btn:hover {
+  background: var(--orange);
+  color: #000;
+}
+
+/* New assessment row */
+.new-assessment-row {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: #050500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.new-btn-terminal {
+  background: var(--orange);
+  color: #000;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+
+.new-btn-terminal:hover { background: #FFB300; }
+
+.prompt-text { color: var(--dim); font-size: 10px; }
+.prompt-text span { color: var(--teal); }
+
+/* Right sidebar */
+.sidebar {
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-hdr {
+  background: #0A0A06;
+  padding: 5px 10px;
+  font-size: 9px;
+  color: var(--teal);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.metric-row {
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #0D0D0D;
+  font-size: 10px;
+}
+
+.metric-row:last-child { border-bottom: none; }
+.metric-lbl { color: var(--dim); }
+.metric-val { font-weight: 600; }
+.mv-orange { color: var(--orange); }
+.mv-teal { color: var(--teal); }
+.mv-green { color: var(--green); }
+.mv-red { color: var(--red); }
+
+/* Posture indicator */
+.posture-block {
+  padding: 10px;
+  text-align: center;
+}
+
+.posture-score {
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--orange);
+  line-height: 1;
+}
+
+.posture-label { font-size: 9px; color: var(--dim); letter-spacing: 1px; margin-top: 4px; }
+
+.posture-bar {
+  height: 4px;
+  background: #1A1A00;
+  margin: 8px 0 4px;
+  position: relative;
+}
+
+.posture-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red), var(--yellow), var(--green));
+  width: 68%;
+}
+
+.posture-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: var(--dim);
+}
+
+/* Compliance mini */
+.comp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+
+.comp-cell {
+  background: var(--bg2);
+  padding: 8px;
+  text-align: center;
+}
+
+.comp-name { font-size: 9px; color: var(--dim); letter-spacing: 1px; }
+.comp-val { font-size: 14px; font-weight: 600; margin-top: 2px; }
+.comp-pass { color: var(--green); }
+.comp-fail { color: var(--red); }
+.comp-partial { color: var(--yellow); }
+
+/* Quick alerts */
+.alert-item {
+  padding: 7px 10px;
+  border-bottom: 1px solid #0D0D0D;
+  font-size: 10px;
+}
+
+.alert-item .al-time { color: var(--dim); font-size: 9px; }
+.alert-item .al-msg { color: var(--text); margin-top: 1px; }
+.alert-item.crit { border-left: 2px solid var(--red); }
+.alert-item.warn { border-left: 2px solid var(--yellow); }
+.alert-item.info { border-left: 2px solid var(--teal); }
+</style>
+</head>
+<body>
+
+<!-- Top sys bar -->
+<div class="sys-bar">
+  <div class="sys-bar-left">ETHNOS VAPT TERMINAL &nbsp;[BBG:SCAN] &nbsp;▸&nbsp; LIVE FEED &nbsp;◂&nbsp; 21 MAR 2026 &nbsp;11:03:44 WAT</div>
+  <div class="sys-bar-right">
+    <div>CONN: <span>●&nbsp;ACTIVE</span></div>
+    <div>SCAN_ENGINE: <span>v2.4</span></div>
+    <div>ENV: <span>PROD-NG-01</span></div>
+    <div>F1=HELP &nbsp;F3=NEW &nbsp;F8=HIST &nbsp;F12=QUIT</div>
+  </div>
+</div>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">GTBANK.COM &nbsp;<span class="up">↑ READY</span> &nbsp;RISK:72 &nbsp;<span class="up">+3</span></span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">FIRSTBANKNIGERIA.COM &nbsp;<span class="dn">REVIEW</span> &nbsp;RISK:81 &nbsp;<span class="dn">+12</span></span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">ZENITHBANK.COM &nbsp;<span class="up">↻ SCANNING</span> &nbsp;RISK:-- &nbsp;ETA:04:33</span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">SEC-COMPLIANCE: <span class="up">ACTIVE</span></span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">NDPA-STATUS: <span class="up">MONITORED</span></span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">ACTIVE-PROBES: <span class="up">13</span></span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">OPEN-VULNS: <span class="dn">24 CRITICAL</span></span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">SP-BALANCE: <span class="up">120 PTS</span></span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">GTBANK.COM &nbsp;<span class="up">↑ READY</span> &nbsp;RISK:72 &nbsp;<span class="up">+3</span></span>
+    <span class="ticker-item">|</span>
+    <span class="ticker-item">FIRSTBANKNIGERIA.COM &nbsp;<span class="dn">REVIEW</span> &nbsp;RISK:81 &nbsp;<span class="dn">+12</span></span>
+  </div>
+</div>
+
+<!-- Header stat row -->
+<div class="header-row">
+  <div class="header-section">
+    <div class="header-logo">SCANONE</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-box-label">TOTAL SCANS</div>
+    <div class="stat-box-val orange">7</div>
+    <div class="stat-box-chg chg-up">↑ +2 MTD</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-box-label">RPT READY</div>
+    <div class="stat-box-val teal">4</div>
+    <div class="stat-box-chg chg-up">↑ DELIV</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-box-label">UNDER REVIEW</div>
+    <div class="stat-box-val red">3</div>
+    <div class="stat-box-chg chg-dn">↓ QA</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-box-label">SP BALANCE</div>
+    <div class="stat-box-val orange">120</div>
+    <div class="stat-box-chg" style="color:var(--dim)">SCANPOINTS</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-box-label">POSTURE</div>
+    <div class="stat-box-val orange">68</div>
+    <div class="stat-box-chg chg-up">↑ +4 WOW</div>
+  </div>
+  <div class="header-section" style="margin-left:auto; border-right:none">
+    <div class="header-label">OPERATOR:</div>
+    <div class="header-value">D.SOMTO-891</div>
+  </div>
+</div>
+
+<!-- Three column layout -->
+<div class="layout">
+
+  <!-- Left nav -->
+  <nav class="nav">
+    <div class="nav-section-title">NAVIGATION</div>
+    <div class="nav-item active">
+      <span class="nav-label">DASHBOARD</span>
+      <span class="nav-key">F2</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-label">SCAN HISTORY</span>
+      <span class="nav-key">F8</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-label">VULNERABILITIES</span>
+      <span class="nav-key">F5</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-label">ACCOUNT</span>
+      <span class="nav-key">F9</span>
+    </div>
+    <div class="nav-section-title" style="margin-top:8px">FILTERS</div>
+    <div class="nav-item">
+      <span class="nav-label">CRITICAL</span>
+      <span class="nav-key" style="color:var(--red)">6</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-label">HIGH</span>
+      <span class="nav-key" style="color:var(--orange)">11</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-label">MEDIUM</span>
+      <span class="nav-key" style="color:var(--yellow)">18</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-label">LOW</span>
+      <span class="nav-key" style="color:var(--green)">34</span>
+    </div>
+    <div class="nav-section-title" style="margin-top:8px">COMPLIANCE</div>
+    <div class="nav-item">
+      <span class="nav-label">NDPA 2023</span>
+      <span class="nav-key" style="color:var(--yellow)">PART</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-label">SEC NG</span>
+      <span class="nav-key" style="color:var(--green)">PASS</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-label">PCI-DSS</span>
+      <span class="nav-key" style="color:var(--red)">FAIL</span>
+    </div>
+
+    <div class="nav-sp">
+      <div class="nav-sp-label">SP BALANCE</div>
+      <div class="nav-sp-val">120</div>
+      <div class="nav-sp-sub">SCANPOINTS REMAINING</div>
+    </div>
+  </nav>
+
+  <!-- Center main -->
+  <main class="main">
+    <!-- Jacob analyst recommendation -->
+    <div class="panel-hdr">
+      <span>ANALYST RECOMMENDATION — JACOB / AI V-CISO</span>
+      <span class="live">● LIVE</span>
+    </div>
+    <div class="jacob-block">
+      <div class="jacob-hdr">
+        <div class="jacob-avatar">J</div>
+        <div class="jacob-meta">
+          <div class="jacob-name">JACOB &nbsp;|&nbsp; AI V-CISO &nbsp;|&nbsp; ETHNOS CYBER</div>
+          <div class="jacob-title">AUTOMATED THREAT INTELLIGENCE &nbsp;·&nbsp; 11:03:44 WAT &nbsp;·&nbsp; CONFIDENCE: 94%</div>
+        </div>
+      </div>
+      <div class="analyst-rec">
+        <span class="rec-tag">PRIORITY</span>
+        Good morning, Operator. Threat scan cycle complete. GTBank TLS 1.0 misconfiguration presents active downgrade risk — recommend immediate SEC NG Rule 4.0 remediation. FirstBank CORS policy requires manual review. Zenithbank scan active — ETA 04:33.
+      </div>
+    </div>
+
+    <!-- New Assessment -->
+    <div class="new-assessment-row">
+      <button class="new-btn-terminal">[ F3 ] NEW ASSESSMENT</button>
+      <div class="prompt-text">TARGET DOMAIN: <span>_</span><span style="color:var(--teal); animation:blink 1s step-end infinite; display:inline-block">█</span></div>
+      <div class="prompt-text" style="margin-left:auto">SCAN CREDIT: <span>120 SP AVAILABLE</span></div>
+    </div>
+
+    <!-- Scan table -->
+    <div class="panel-hdr" style="margin-top:0">
+      <span>RECENT ASSESSMENTS &nbsp;[3 RECORDS]</span>
+      <span style="color:var(--dim)">SORTED BY: DATE DESC &nbsp;|&nbsp; <span style="color:var(--teal)">LIVE</span></span>
+    </div>
+
+    <table class="scan-table">
+      <thead>
+        <tr>
+          <th>TARGET DOMAIN</th>
+          <th>STATUS</th>
+          <th>RISK SCORE</th>
+          <th>FINDINGS BREAKDOWN</th>
+          <th>LAST UPDATED</th>
+          <th>POSTURE</th>
+          <th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="flash-row">
+          <td class="domain-cell">gtbank.com<br><span>GTB / FINTECH / TIER-1</span></td>
+          <td><span class="indicator ind-ready">↑ REPORT READY</span></td>
+          <td style="color:var(--orange); font-weight:600;">72 <span style="font-size:9px;color:var(--dim)">/ 100</span></td>
+          <td>
+            <div class="severity-row">
+              <span class="sev sev-c">C:3</span>
+              <span class="sev sev-h">H:7</span>
+              <span class="sev sev-m">M:12</span>
+              <span class="sev sev-l">L:8</span>
+            </div>
+          </td>
+          <td style="color:var(--dim)">2026-03-21 09:14</td>
+          <td style="color:var(--orange)">MODERATE ↓</td>
+          <td><button class="action-btn">VIEW</button></td>
+        </tr>
+        <tr>
+          <td class="domain-cell">firstbanknigeria.com<br><span>FBN / BANKING / TIER-1</span></td>
+          <td><span class="indicator ind-review">⚠ UNDER REVIEW</span></td>
+          <td style="color:var(--red); font-weight:600;">81 <span style="font-size:9px;color:var(--dim)">/ 100</span></td>
+          <td>
+            <div class="severity-row">
+              <span class="sev sev-c">C:6</span>
+              <span class="sev sev-h">H:11</span>
+              <span class="sev sev-m">M:9</span>
+              <span class="sev sev-l">L:4</span>
+            </div>
+          </td>
+          <td style="color:var(--dim)">2026-03-20 16:42</td>
+          <td style="color:var(--red)">HIGH RISK ↓↓</td>
+          <td><button class="action-btn">REVIEW</button></td>
+        </tr>
+        <tr>
+          <td class="domain-cell">zenithbank.com<br><span>ZBL / BANKING / TIER-1</span></td>
+          <td><span class="indicator ind-scan">↻ SCANNING [68%]</span></td>
+          <td style="color:var(--dim)">-- <span style="font-size:9px">IN PROGRESS</span></td>
+          <td>
+            <div class="severity-row">
+              <span class="sev sev-c">C:--</span>
+              <span class="sev sev-h">H:--</span>
+              <span class="sev sev-m">M:--</span>
+              <span class="sev sev-l">L:--</span>
+            </div>
+          </td>
+          <td style="color:var(--teal)">ETA: 04:33 REM</td>
+          <td style="color:var(--teal)">SCANNING...</td>
+          <td><button class="action-btn" style="border-color:var(--teal);color:var(--teal)">WATCH</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Bottom status bar -->
+    <div style="padding:6px 12px; background:var(--bg3); border-top:1px solid var(--border); font-size:9px; color:var(--dim); margin-top:auto; letter-spacing:1px">
+      ETHNOS-VAPT &nbsp;|&nbsp; SCANONE TERMINAL v2.4.1 &nbsp;|&nbsp; NODE: PROD-NG-01 &nbsp;|&nbsp; DB: MONGO-ATLAS/CONNECTED &nbsp;|&nbsp; ZAP: 8080/ACTIVE &nbsp;|&nbsp; MAP: 8090/ACTIVE &nbsp;|&nbsp; UPTIME: 14D 06H 33M &nbsp;|&nbsp; <span style="color:var(--green)">ALL SYSTEMS OPERATIONAL</span>
+    </div>
+  </main>
+
+  <!-- Right sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-hdr">SECURITY POSTURE</div>
+      <div class="posture-block">
+        <div class="posture-score">68</div>
+        <div class="posture-label">RISK INDEX (0=CLEAN 100=CRITICAL)</div>
+        <div class="posture-bar"><div class="posture-fill"></div></div>
+        <div class="posture-bar-labels"><span>0</span><span>50</span><span>100</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-hdr">KEY METRICS</div>
+      <div class="metric-row"><span class="metric-lbl">AVG RISK SCORE</span><span class="metric-val mv-orange">76.5</span></div>
+      <div class="metric-row"><span class="metric-lbl">CRITICAL VULNS</span><span class="metric-val mv-red">9</span></div>
+      <div class="metric-row"><span class="metric-lbl">HIGH VULNS</span><span class="metric-val mv-orange">18</span></div>
+      <div class="metric-row"><span class="metric-lbl">SCAN SUCCESS RATE</span><span class="metric-val mv-green">100%</span></div>
+      <div class="metric-row"><span class="metric-lbl">AVG SCAN TIME</span><span class="metric-val mv-teal">18:42</span></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-hdr">COMPLIANCE STATUS</div>
+      <div class="comp-grid">
+        <div class="comp-cell"><div class="comp-name">NDPA</div><div class="comp-val comp-partial">PART</div></div>
+        <div class="comp-cell"><div class="comp-name">SEC-NG</div><div class="comp-val comp-pass">PASS</div></div>
+        <div class="comp-cell"><div class="comp-name">PCI-DSS</div><div class="comp-val comp-fail">FAIL</div></div>
+        <div class="comp-cell"><div class="comp-name">OWASP</div><div class="comp-val comp-partial">PART</div></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-hdr">LIVE ALERTS</div>
+      <div class="alert-item crit">
+        <div class="al-time">11:04:19</div>
+        <div class="al-msg">TLS 1.0 downgrade risk — zenithbank.com</div>
+      </div>
+      <div class="alert-item warn">
+        <div class="al-time">11:04:45</div>
+        <div class="al-msg">3 open ports — Shodan probe</div>
+      </div>
+      <div class="alert-item info">
+        <div class="al-time">09:14:00</div>
+        <div class="al-msg">GTBank report ready for delivery</div>
+      </div>
+      <div class="alert-item warn">
+        <div class="al-time">08:32:11</div>
+        <div class="al-msg">CORS misconfiguration — firstbank</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

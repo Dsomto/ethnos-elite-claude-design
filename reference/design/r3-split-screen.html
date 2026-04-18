@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScanOne — Split Screen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+    }
+
+    /* ─── LEFT PANEL ─── */
+    .panel-left {
+      width: 40%;
+      background: #DC1F26;
+      display: flex;
+      flex-direction: column;
+      padding: 48px 44px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Dot pattern overlay */
+    .panel-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+      background-size: 22px 22px;
+      pointer-events: none;
+    }
+
+    .left-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Logo row */
+    .left-logo {
+      font-size: 14px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 64px;
+      opacity: 0.9;
+    }
+
+    /* Avatar */
+    .j-avatar {
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: #FFFFFF;
+      margin-bottom: 28px;
+    }
+
+    .left-greeting {
+      font-size: 36px;
+      font-weight: 900;
+      color: #FFFFFF;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .left-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 280px;
+      margin-bottom: 48px;
+    }
+
+    /* Nav links on red side */
+    .left-nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .left-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .left-nav li a:hover {
+      background: rgba(255,255,255,0.12);
+      color: #FFFFFF;
+    }
+
+    .left-nav li a.active {
+      background: rgba(255,255,255,0.18);
+      color: #FFFFFF;
+    }
+
+    .left-sp {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.06em;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .left-sp strong {
+      color: #FFFFFF;
+      font-size: 22px;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* ─── RIGHT PANEL ─── */
+    .panel-right {
+      width: 60%;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      padding: 48px 52px;
+      overflow-y: auto;
+      border-left: 3px solid #111111;
+    }
+
+    .right-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 44px;
+    }
+
+    .right-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #111111;
+      letter-spacing: -0.01em;
+    }
+
+    /* ─── STATS ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: #FFFFFF;
+      border: 2px solid #E5E5E5;
+      border-radius: 8px;
+      padding: 22px 24px;
+      transition: border-color 0.15s;
+    }
+
+    .stat-card:hover {
+      border-color: #DC1F26;
+    }
+
+    .stat-card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #AAAAAA;
+      margin-bottom: 8px;
+    }
+
+    .stat-card-number {
+      font-size: 48px;
+      font-weight: 900;
+      color: #DC1F26;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    /* ─── NEW ASSESSMENT BTN ─── */
+    .btn-new {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #DC1F26;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      margin-bottom: 36px;
+      transition: background 0.15s;
+      width: 100%;
+    }
+
+    .btn-new:hover { background: #B01218; }
+
+    /* ─── SCAN LIST ─── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #AAAAAA;
+      margin-bottom: 16px;
+    }
+
+    .scan-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .scan-row {
+      display: flex;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid #F0F0F0;
+      gap: 16px;
+    }
+
+    .scan-row:last-child { border-bottom: none; }
+
+    .scan-status-bar {
+      width: 4px;
+      height: 40px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .scan-status-bar.ready    { background: #DC1F26; }
+    .scan-status-bar.review   { background: #E5E5E5; }
+    .scan-status-bar.scanning {
+      background: #DC1F26;
+      animation: bar-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bar-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .scan-info { flex: 1; }
+
+    .scan-domain {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 3px;
+    }
+
+    .scan-date {
+      font-size: 11px;
+      color: #AAAAAA;
+    }
+
+    .scan-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .scan-badge.ready {
+      background: #FFE8E9;
+      color: #DC1F26;
+    }
+
+    .scan-badge.review {
+      background: #F0F0F0;
+      color: #888888;
+    }
+
+    .scan-badge.scanning {
+      background: #FFF0F0;
+      color: #FF3340;
+    }
+
+    .scan-action {
+      font-size: 13px;
+      color: #DC1F26;
+      font-weight: 600;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT PANEL: Red -->
+  <div class="panel-left">
+    <div class="left-content">
+      <div class="left-logo">ScanOne</div>
+
+      <div class="j-avatar">J</div>
+      <h2 class="left-greeting">Good evening,<br>Agent.</h2>
+      <p class="left-sub">Threat intel standing by. Your assessments are monitored in real time.</p>
+
+      <ul class="left-nav">
+        <li><a href="#" class="active">&#9632; Dashboard</a></li>
+        <li><a href="#">&#9632; History</a></li>
+        <li><a href="#">&#9632; Vulnerabilities</a></li>
+        <li><a href="#">&#9632; Account</a></li>
+      </ul>
+
+      <div class="left-sp">
+        SP Balance
+        <strong>120 SP</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: White -->
+  <div class="panel-right">
+
+    <div class="right-header">
+      <h1 class="right-title">Dashboard</h1>
+      <span style="font-size:12px;color:#AAAAAA;">Sat 21 March 2026</span>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-label">Total Scans</div>
+        <div class="stat-card-number">7</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Reports Ready</div>
+        <div class="stat-card-number">4</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Under Review</div>
+        <div class="stat-card-number">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">SP Balance</div>
+        <div class="stat-card-number">120</div>
+      </div>
+    </div>
+
+    <!-- NEW ASSESSMENT -->
+    <button class="btn-new">+ New Assessment</button>
+
+    <!-- RECENT SCANS -->
+    <div class="section-label">Recent Assessments</div>
+    <div class="scan-list">
+
+      <div class="scan-row">
+        <div class="scan-status-bar ready"></div>
+        <div class="scan-info">
+          <div class="scan-domain">gtbank.com</div>
+          <div class="scan-date">20 Mar 2026</div>
+        </div>
+        <span class="scan-badge ready">Ready</span>
+        <a href="#" class="scan-action">View →</a>
+      </div>
+
+      <div class="scan-row">
+        <div class="scan-status-bar review"></div>
+        <div class="scan-info">
+          <div class="scan-domain">firstbanknigeria.com</div>
+          <div class="scan-date">18 Mar 2026</div>
+        </div>
+        <span class="scan-badge review">In Review</span>
+        <a href="#" class="scan-action" style="color:#AAAAAA;">View →</a>
+      </div>
+
+      <div class="scan-row">
+        <div class="scan-status-bar scanning"></div>
+        <div class="scan-info">
+          <div class="scan-domain">zenithbank.com</div>
+          <div class="scan-date">21 Mar 2026 — now</div>
+        </div>
+        <span class="scan-badge scanning">Scanning</span>
+        <a href="#" class="scan-action">Live →</a>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

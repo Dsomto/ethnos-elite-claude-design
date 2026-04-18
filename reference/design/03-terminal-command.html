@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanOne — Terminal Command</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #000000;
+  --green: #00FF41;
+  --green-dim: #66FF66;
+  --green-dark: #003B00;
+  --green-muted: #1A6B1A;
+  --amber: #FFB000;
+  --red: #DC1F26;
+  --white: #E8FFE8;
+}
+
+html, body {
+  height: 100%;
+  background: var(--black);
+  color: var(--green);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* CRT Scanline effect */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* CRT flicker */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 255, 65, 0.02);
+  animation: flicker 8s infinite;
+  pointer-events: none;
+  z-index: 998;
+}
+
+@keyframes flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.85; }
+  97% { opacity: 1; }
+  98% { opacity: 0.9; }
+  99% { opacity: 1; }
+}
+
+/* Cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--green);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+}
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--green-dark);
+  border-bottom: 1px solid var(--green-muted);
+  padding: 6px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar-left {
+  color: var(--green-dim);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 11px;
+  color: var(--green-dim);
+}
+
+.topbar-sep { color: var(--green-muted); }
+
+/* ── WINDOW CHROME ── */
+.terminal-window {
+  margin: 16px;
+  border: 1px solid var(--green-muted);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 20px rgba(0,255,65,0.05), inset 0 0 60px rgba(0,255,65,0.02);
+}
+
+.window-titlebar {
+  background: var(--green-dark);
+  border-bottom: 1px solid var(--green-muted);
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.window-title { font-size: 11px; color: var(--green-dim); letter-spacing: 1px; }
+
+.window-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.wc {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid;
+}
+
+.wc.close { border-color: #FF5F57; background: transparent; }
+.wc.min { border-color: #FFBD2E; background: transparent; }
+.wc.max { border-color: #27C93F; background: transparent; }
+
+.terminal-body {
+  padding: 16px 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── ASCII SECTIONS ── */
+.ascii-box {
+  margin-bottom: 20px;
+}
+
+.ascii-top { color: var(--green-muted); font-size: 12px; }
+.ascii-title-row {
+  background: var(--green-dark);
+  padding: 4px 0;
+  color: var(--green);
+  font-size: 12px;
+}
+
+/* ── BANNER ── */
+.banner {
+  color: var(--green);
+  font-size: 11px;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.banner-line { white-space: pre; }
+
+/* ── PROMPT LINES ── */
+.prompt-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 2px;
+}
+
+.prompt-symbol { color: var(--green-dim); margin-right: 4px; user-select: none; }
+.prompt-user { color: var(--green); }
+.prompt-at { color: var(--green-muted); }
+.prompt-host { color: var(--green-dim); }
+.prompt-path { color: var(--green-muted); }
+.prompt-cmd { color: var(--white); }
+
+.output-line {
+  color: var(--green-dim);
+  padding-left: 16px;
+  margin-bottom: 1px;
+  font-size: 12.5px;
+}
+
+.output-line.bold { color: var(--green); font-weight: bold; }
+.output-line.amber { color: var(--amber); }
+.output-line.red { color: var(--red); }
+.output-line.dim { color: var(--green-muted); }
+
+.empty-line { height: 10px; }
+
+/* ── STAT BLOCK ── */
+.stat-block {
+  background: rgba(0,59,0,0.4);
+  border: 1px solid var(--green-muted);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.stat-block-title {
+  color: var(--green-dim);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--green-muted);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.stat-row-line {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.stat-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-key { color: var(--green-muted); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+.stat-val { color: var(--green); font-size: 22px; font-weight: bold; }
+
+/* ── LS OUTPUT ── */
+.ls-header {
+  color: var(--green-muted);
+  font-size: 12px;
+  margin-bottom: 4px;
+  padding-left: 16px;
+}
+
+.ls-row {
+  display: grid;
+  grid-template-columns: 90px 60px 60px 130px 1fr 120px;
+  gap: 0 8px;
+  padding: 3px 16px;
+  font-size: 12.5px;
+  align-items: center;
+  transition: background 0.1s;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+
+.ls-row:hover { background: rgba(0,255,65,0.04); }
+
+.ls-row.ready { border-left-color: #00FF41; }
+.ls-row.review { border-left-color: #FFB000; }
+.ls-row.scanning { border-left-color: #6366F1; }
+
+.ls-perms { color: var(--green-muted); }
+.ls-links { color: var(--green-muted); text-align: right; }
+.ls-user { color: var(--green-dim); }
+.ls-date { color: var(--green-muted); }
+.ls-name { color: var(--white); font-weight: bold; }
+
+.ls-status { text-align: right; }
+.ls-status-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.ls-status-badge.ready { background: rgba(0,255,65,0.15); color: var(--green); border: 1px solid rgba(0,255,65,0.3); }
+.ls-status-badge.review { background: rgba(255,176,0,0.15); color: var(--amber); border: 1px solid rgba(255,176,0,0.3); }
+.ls-status-badge.scanning { background: rgba(99,102,241,0.15); color: #818CF8; border: 1px solid rgba(99,102,241,0.3); animation: scanning-pulse 1.5s ease-in-out infinite; }
+
+@keyframes scanning-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── NAV BLOCK ── */
+.nav-block {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border: 1px solid var(--green-muted);
+}
+
+.nav-tab {
+  padding: 6px 16px;
+  font-size: 11.5px;
+  color: var(--green-muted);
+  cursor: pointer;
+  border-right: 1px solid var(--green-muted);
+  transition: all 0.1s;
+  letter-spacing: 0.5px;
+}
+
+.nav-tab:last-child { border-right: none; }
+.nav-tab:hover { background: var(--green-dark); color: var(--green-dim); }
+.nav-tab.active { background: rgba(0,255,65,0.12); color: var(--green); font-weight: bold; }
+
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  border-top: 1px solid var(--green-muted);
+  padding: 6px 20px;
+  background: var(--green-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--green-muted);
+}
+
+.bottom-status { display: flex; gap: 16px; align-items: center; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: blink 2s ease-in-out infinite; }
+
+/* ── NEW ASSESSMENT BTN ── */
+.btn-terminal {
+  background: rgba(0,255,65,0.12);
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 6px 16px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+  font-weight: bold;
+}
+
+.btn-terminal:hover {
+  background: rgba(0,255,65,0.2);
+  box-shadow: 0 0 10px rgba(0,255,65,0.3);
+}
+
+/* ── SP DISPLAY ── */
+.sp-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 16px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+}
+
+.sp-key { color: var(--green-muted); }
+.sp-val { color: var(--amber); font-size: 18px; font-weight: bold; }
+.sp-unit { color: var(--green-muted); font-size: 11px; }
+
+/* ── RISK TABLE ── */
+.risk-mini {
+  padding-left: 16px;
+  margin-bottom: 16px;
+}
+
+.risk-mini-row {
+  display: grid;
+  grid-template-columns: 80px 30px 1fr;
+  gap: 0 8px;
+  margin-bottom: 4px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.risk-mini-label { color: var(--green-dim); }
+.risk-mini-count { color: var(--green); font-weight: bold; text-align: right; }
+.risk-bar-ascii { color: var(--green-muted); font-size: 11px; letter-spacing: -1px; }
+.risk-bar-ascii.critical { color: var(--red); }
+.risk-bar-ascii.high { color: var(--amber); }
+.risk-bar-ascii.medium { color: var(--green); }
+.risk-bar-ascii.low { color: var(--green-muted); }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">ETHNOS-CYBER :: SCANONE SECURITY TERMINAL v2.1.4</div>
+    <div class="topbar-right">
+      <span>TTY: pts/0</span>
+      <span class="topbar-sep">|</span>
+      <span>USER: analyst@ethnos</span>
+      <span class="topbar-sep">|</span>
+      <span id="time-display">2026-03-21 09:41:32</span>
+    </div>
+  </div>
+
+  <!-- TERMINAL WINDOW -->
+  <div class="terminal-window">
+    <div class="window-titlebar">
+      <span class="window-title">bash — scanone@ethnos-cyber: ~/dashboard</span>
+      <div class="window-controls">
+        <div class="wc close"></div>
+        <div class="wc min"></div>
+        <div class="wc max"></div>
+      </div>
+    </div>
+
+    <div class="terminal-body">
+
+      <!-- BANNER ASCII -->
+      <div class="banner">
+        <div class="banner-line" style="color:#00FF41; font-size:11px; line-height:1.2;">
+╔═══════════════════════════════════════════════════════════════════╗
+║  ███████╗ ██████╗ █████╗ ███╗  ██╗ ██████╗ ███╗  ██╗███████╗    ║
+║  ██╔════╝██╔════╝██╔══██╗████╗ ██║██╔═══██╗████╗ ██║██╔════╝    ║
+║  ███████╗██║     ███████║██╔██╗██║██║   ██║██╔██╗██║█████╗      ║
+║  ╚════██║██║     ██╔══██║██║╚████║██║   ██║██║╚████║██╔══╝      ║
+║  ███████║╚██████╗██║  ██║██║ ╚███║╚██████╔╝██║ ╚███║███████╗    ║
+║  ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚══╝ ╚═════╝ ╚═╝  ╚══╝╚══════╝   ║
+║                    VAPT INTELLIGENCE PLATFORM                    ║
+╚═══════════════════════════════════════════════════════════════════╝
+        </div>
+      </div>
+
+      <!-- NAV TABS -->
+      <div class="nav-block">
+        <div class="nav-tab active">[DASHBOARD]</div>
+        <div class="nav-tab">HISTORY</div>
+        <div class="nav-tab">VULNS</div>
+        <div class="nav-tab">ACCOUNT</div>
+        <div style="flex:1; background:var(--green-dark);"></div>
+        <button class="btn-terminal">[ + NEW ASSESSMENT ]</button>
+      </div>
+
+      <!-- Jacob intro -->
+      <div class="prompt-line">
+        <span class="prompt-symbol">root@scanone</span><span style="color:var(--green-muted)">:</span><span class="prompt-path">~/dashboard</span><span style="color:var(--green-muted)">$</span>&nbsp;
+        <span class="prompt-cmd">jacob --greet --status</span>
+      </div>
+      <div class="output-line bold">┌─────────────────────────────────────────────────────────┐</div>
+      <div class="output-line bold">│ JACOB — AI SECURITY ANALYST  [AI V-CISO MODULE ACTIVE]  │</div>
+      <div class="output-line bold">└─────────────────────────────────────────────────────────┘</div>
+      <div class="output-line">&gt; INITIALIZING THREAT INTELLIGENCE CONTEXT...</div>
+      <div class="output-line">&gt; Portfolio loaded: 7 scans indexed</div>
+      <div class="output-line">&gt; Status: 4 REPORTS READY | 3 UNDER REVIEW | 0 CRITICAL FLAGS</div>
+      <div class="output-line">&gt; <span style="color:var(--green)">Good morning, analyst. No critical escalations in last 24h.</span></div>
+      <div class="output-line amber">&gt; ADVISORY: firstbanknigeria.com QA review pending sign-off.</div>
+      <div class="output-line">&gt; <span style="color:var(--green-dim)">Type `jacob --help` for full command reference.</span></div>
+      <div class="empty-line"></div>
+
+      <!-- Stats -->
+      <div class="prompt-line">
+        <span class="prompt-symbol">root@scanone</span><span style="color:var(--green-muted)">:</span><span class="prompt-path">~/dashboard</span><span style="color:var(--green-muted)">$</span>&nbsp;
+        <span class="prompt-cmd">scanone stats --verbose</span>
+      </div>
+      <div class="empty-line"></div>
+      <div class="stat-block">
+        <div class="stat-block-title">// ACCOUNT METRICS</div>
+        <div class="stat-row-line">
+          <div class="stat-entry">
+            <span class="stat-key">Total Scans</span>
+            <span class="stat-val">07</span>
+          </div>
+          <div class="stat-entry">
+            <span class="stat-key">Reports Ready</span>
+            <span class="stat-val" style="color:#00FF41">04</span>
+          </div>
+          <div class="stat-entry">
+            <span class="stat-key">Under Review</span>
+            <span class="stat-val" style="color:#FFB000">03</span>
+          </div>
+          <div class="stat-entry">
+            <span class="stat-key">SP Balance</span>
+            <span class="stat-val" style="color:#FFB000">120</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Risk distribution -->
+      <div class="output-line dim">// RISK DISTRIBUTION ACROSS ALL SCANS:</div>
+      <div class="risk-mini">
+        <div class="risk-mini-row">
+          <span class="risk-mini-label">CRITICAL</span>
+          <span class="risk-mini-count" style="color:#DC1F26">12</span>
+          <span class="risk-bar-ascii critical">████████████░░░░░░░░</span>
+        </div>
+        <div class="risk-mini-row">
+          <span class="risk-mini-label">HIGH</span>
+          <span class="risk-mini-count" style="color:#FFB000">18</span>
+          <span class="risk-bar-ascii high">███████████████░░░░░</span>
+        </div>
+        <div class="risk-mini-row">
+          <span class="risk-mini-label">MEDIUM</span>
+          <span class="risk-mini-count" style="color:#00FF41">24</span>
+          <span class="risk-bar-ascii medium">███████████████████░</span>
+        </div>
+        <div class="risk-mini-row">
+          <span class="risk-mini-label">LOW</span>
+          <span class="risk-mini-count" style="color:#66FF66">09</span>
+          <span class="risk-bar-ascii low">████████░░░░░░░░░░░░</span>
+        </div>
+      </div>
+
+      <!-- ls output -->
+      <div class="prompt-line">
+        <span class="prompt-symbol">root@scanone</span><span style="color:var(--green-muted)">:</span><span class="prompt-path">~/dashboard</span><span style="color:var(--green-muted)">$</span>&nbsp;
+        <span class="prompt-cmd">ls -lah ./assessments/ --sort=date</span>
+      </div>
+      <div class="empty-line"></div>
+      <div class="ls-header">total 3 assessments  |  drwxr-x  ethnos  /home/analyst/assessments</div>
+
+      <div class="ls-row ready">
+        <span class="ls-perms">-rwxr--r--</span>
+        <span class="ls-links">1</span>
+        <span class="ls-user">analyst</span>
+        <span class="ls-date">Mar 21 09:31</span>
+        <span class="ls-name">gtbank.com</span>
+        <span class="ls-status"><span class="ls-status-badge ready">[REPORT_READY]</span></span>
+      </div>
+
+      <div class="ls-row review">
+        <span class="ls-perms">-rwxr--r--</span>
+        <span class="ls-links">1</span>
+        <span class="ls-user">analyst</span>
+        <span class="ls-date">Mar 20 14:17</span>
+        <span class="ls-name">firstbanknigeria.com</span>
+        <span class="ls-status"><span class="ls-status-badge review">[UNDER_REVIEW]</span></span>
+      </div>
+
+      <div class="ls-row scanning">
+        <span class="ls-perms">-rwx------</span>
+        <span class="ls-links">1</span>
+        <span class="ls-user">analyst</span>
+        <span class="ls-date">Mar 21 09:40</span>
+        <span class="ls-name">zenithbank.com</span>
+        <span class="ls-status"><span class="ls-status-badge scanning">[SCANNING...]</span></span>
+      </div>
+
+      <div class="empty-line"></div>
+
+      <!-- SP info -->
+      <div class="sp-line">
+        <span class="sp-key">SCANPOINTS:</span>
+        <span class="sp-val">120</span>
+        <span class="sp-unit">SP  [≈ 6 full assessments remaining]</span>
+      </div>
+
+      <!-- Active prompt -->
+      <div class="prompt-line">
+        <span class="prompt-symbol">root@scanone</span><span style="color:var(--green-muted)">:</span><span class="prompt-path">~/dashboard</span><span style="color:var(--green-muted)">$</span>&nbsp;
+        <span class="cursor"></span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar">
+    <div class="bottom-status">
+      <span class="status-dot"></span>
+      <span>SYSTEM ONLINE</span>
+      <span>|</span>
+      <span>JACOB: ACTIVE</span>
+      <span>|</span>
+      <span style="color:var(--amber)">1 SCAN RUNNING</span>
+    </div>
+    <div>ETHNOS CYBER · SCANONE v2.1.4 · SESSION: analyst@ethnos</div>
+  </div>
+
+</div>
+
+<script>
+// Live clock
+function updateClock() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('time-display').textContent =
+    `2026-03-21 ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
