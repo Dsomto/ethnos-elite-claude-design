@@ -38,9 +38,10 @@ SMEs don't have security teams. They either ignore security until a breach, or t
 - Info: `#64748B`
 
 ### Typography
-- UI + body: **Inter**, system-ui fallback
+- UI + body: **Inter** (self-hosted — `assets/fonts/Inter-Variable.woff2`), system-ui fallback
 - Headings: **Inter** bold/semi-bold
-- Code / terminal: SF Mono, Menlo
+- Code / terminal: **JetBrains Mono** (self-hosted — `assets/fonts/JetBrainsMono-Regular.ttf`), Menlo fallback
+- Both fonts are registered via `assets/fonts/fonts.css`. Claude Design must load these files — **do not substitute** with Helvetica, Arial, or any web-safe fallback.
 
 ### Tone of voice
 - Confident but not arrogant

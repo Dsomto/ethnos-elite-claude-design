@@ -1,31 +1,33 @@
 # Claude Design — Ethnos-Elite Brand Kit
 
-This folder is the drop-in for Anthropic's Claude Design tool. It holds the brand brief, infomercial brief, and a small asset bundle so Claude Design can stay on-brand across every artifact it generates.
+Drop-in for Anthropic's Claude Design tool. Holds the brand brief, infomercial brief, brand fonts, and visual references so Claude Design stays on-brand across every artifact it generates.
 
 ## Folder contents
-- `BRAND_BRIEF.md` — company blurb, palette, type, voice, do's and don'ts
-- `INFOMERCIAL_BRIEF.md` — the marketing piece we want to produce first
+- `BRAND_BRIEF.md` — company blurb, palette, typography, voice, do's and don'ts
+- `INFOMERCIAL_BRIEF.md` — the 60-second video infomercial spec
 - `assets/` — logos, favicon, team/office imagery
+- `assets/fonts/` — self-hosted Inter + JetBrains Mono so Claude Design never substitutes
+- `reference/design/` — 20 landing-page HTML explorations (visual language reference)
+- `reference/landing/` — production `Landing.jsx` + `index.css` (source of truth for tokens)
 
 ## How to fill in the Claude Design setup form
 
 **Company name and blurb →** paste the "Longer blurb" from `BRAND_BRIEF.md`.
 
-**Link code on GitHub →** paste the repo URL (if this repo is on GitHub). Otherwise use the "Link code from your computer" option and select this `.claude-design/` folder plus `client/src/`.
+**Link code on GitHub →** `https://github.com/Dsomto/ethnos-elite-claude-design`
 
-**Upload a .fig file →** skip (we don't have one yet).
+**Upload a .fig file →** skip (we don't have one).
 
-**Add fonts, logos, assets →** drag everything in `.claude-design/assets/` into this field.
+**Add fonts, logos, assets →** drag everything in `assets/` **including `assets/fonts/`** into this field. The `.woff2` and `.ttf` files are critical — without them Claude Design substitutes with Helvetica/Arial and the brand breaks.
 
 **Any other notes? →** paste:
 
-> Brand is `#1B4FBF` royal blue with `#163FA0` navy gradient. Inter typeface. African SME audience — empathetic, calm, confident voice. Never use hacker-in-hoodie, matrix-green, or floating-padlock imagery. First artifact we want is a 6-slide deck + one-page infomercial — see INFOMERCIAL_BRIEF.md in the code folder.
+> Brand is `#1B4FBF` royal blue with `#163FA0` navy gradient. Typography: **Inter** for UI/body/headings, **JetBrains Mono** for code/terminal — both self-hosted in `assets/fonts/` via `fonts.css`. Do not substitute typefaces under any condition. African SME audience — empathetic, calm, confident voice. Never use hacker-in-hoodie, matrix-green, or floating-padlock imagery. First artifact we want is a 60-second video storyboard — see `INFOMERCIAL_BRIEF.md`.
 
 ## After setup — first prompts to run
 See the "First prompt to paste" block at the bottom of `INFOMERCIAL_BRIEF.md`.
 
-## What's authoritative in the repo
-If anything in `BRAND_BRIEF.md` drifts from the product, the truth lives in:
-- `client/src/index.css` (colors/tokens)
-- `client/src/pages/Landing.jsx` (hero + section patterns)
-- `client/public/design/02-clean-pro.html` (closest current aesthetic)
+## What's authoritative if the brief drifts
+- `reference/landing/index.css` — colors/tokens
+- `reference/landing/Landing.jsx` — hero + section patterns
+- `reference/design/02-clean-pro.html` — closest current aesthetic
